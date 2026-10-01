@@ -1,0 +1,34 @@
+{{ 'mn-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+  #shopify-section-{{ section.id }} .mn-frase__texto { font-size: clamp(28px, 4.6vw, {{ s.tamano }}px); text-align: {{ s.alineacion }}; }
+{% endstyle %}
+<section class="mn-section mn-escena">
+  <div class="mn-container">
+    <div class="mn-frase__caja mn-hundido" data-mn-3d style="--mn-3d-x: 12deg;">
+      {%- if s.etiqueta != blank -%}<p class="mn-etiqueta" style="margin-bottom: 22px; text-align: {{ s.alineacion }};">{{ s.etiqueta }}</p>{%- endif -%}
+      <p class="mn-frase__texto mn-display" data-mn-frase data-acento="{{ s.palabras_acento | escape }}">{{ s.frase }}</p>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Frase que se ilumina",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "Manifiesto" },
+    { "type": "textarea", "id": "frase", "label": "Frase (se ilumina palabra a palabra al bajar)", "default": "Cada pieza de MORENO empieza en tela desnuda. Lienzo es esa tela, sin pintar: para llevarla sola, o debajo de tu pieza más ruidosa." },
+    { "type": "text", "id": "palabras_acento", "label": "Palabras en color (separadas por comas)", "default": "desnuda, lienzo, ruidosa" },
+    { "type": "range", "id": "tamano", "label": "Tamaño máximo de la frase", "min": 32, "max": 96, "step": 4, "unit": "px", "default": 68 },
+    { "type": "select", "id": "alineacion", "label": "Alineación", "options": [{ "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }], "default": "left" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [{ "name": "MN · Frase que se ilumina" }]
+}
+{% endschema %}

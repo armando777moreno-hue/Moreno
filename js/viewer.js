@@ -10,6 +10,8 @@
  * y dentro: [data-stage] > canvas, [data-fallback] > [data-flip] > img×2, [data-hint],
  * botones [data-view] (front|side|back|spin) y botones [data-c] para el color.
  * API: el elemento recibe root.morenoSetColor(c) y emite el evento 'moreno:color'.
+ * Con data-scroll="<vueltas>" la prenda gira según el avance del scroll por su sección
+ * (arrastrar sigue funcionando y desplaza el punto de partida).
  */
 (function () {
   'use strict';
@@ -156,7 +158,13 @@
       // ---- Interacción ----
       var angle = VIEWS.front, target = null, velocity = 0, tilt = 0, tiltTarget = 0;
       var dragging = false, decided = false, lastX = 0, lastY = 0, startX = 0, startY = 0, lastT = 0;
-      var lastInput = 0, autoSpin = !reduceMotion;
+      var scrollTurns = parseFloat(root.dataset.scroll || '0') || 0;
+      var lastInput = 0, autoSpin = !reduceMotion && !scrollTurns, scrollOffset = 0;
+      function scrollAngle() { // 0..1 según cuánto ha recorrido la sección la pantalla
+        var r = root.getBoundingClientRect(), vh = window.innerHeight || 1;
+        var p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+        return scrollOffset + p * scrollTurns * Math.PI * 2;
+      }
 
       function bump() { lastInput = performance.now(); if (hint) hint.classList.add('is-hidden'); }
 
@@ -185,6 +193,7 @@
       function release() {
         if (!dragging) return;
         dragging = false; stage.classList.remove('is-dragging'); tiltTarget = 0; bump();
+        if (scrollTurns) { velocity = 0; scrollOffset += angle - scrollAngle(); }
       }
       window.addEventListener('pointerup', release);
       window.addEventListener('pointercancel', release);
@@ -203,6 +212,7 @@
           var twoPi = Math.PI * 2; // camino más corto hasta el ángulo pedido
           var diff = ((VIEWS[v] - angle) % twoPi + twoPi * 1.5) % twoPi - Math.PI;
           target = angle + diff; velocity = 0;
+          if (scrollTurns) scrollOffset += diff;
           select(v);
         });
       });
@@ -232,6 +242,8 @@
             if (Math.abs(target - angle) < 0.0005) { angle = target; target = null; }
           } else if (Math.abs(velocity) > 0.0005) {
             angle += velocity; velocity *= Math.pow(0.92, dt * 60);
+          } else if (scrollTurns && !reduceMotion) {
+            angle += (scrollAngle() - angle) * Math.min(1, dt * 5);
           } else if (autoSpin && now - lastInput > IDLE_MS) {
             angle += AUTO_SPEED * dt;
           }
