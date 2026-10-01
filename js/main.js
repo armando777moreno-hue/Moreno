@@ -2,16 +2,39 @@
 (function () {
   'use strict';
 
-  // Datos del producto. Precio y tallas: ajustar antes de publicar.
+  // Tienda Shopify: el pago se hace en su checkout mediante enlaces de carrito
+  // (/cart/<variante>:<cantidad>), así que no hace falta ninguna clave.
+  var SHOP = 'https://autods-user-store-52230-g0uyjwy5.myshopify.com';
+
+  // Producto "Atardecer — Oversized Art Tee" en Shopify (IDs de variante por talla).
   var PRODUCT = {
-    id: 'camiseta-atardecer',
+    id: 'atardecer-oversized-art-tee',
     name: 'Camiseta Atardecer',
     color: 'Crema',
-    price: 65,
     currency: 'USD',
-    sizes: ['S', 'M', 'L', 'XL'],
-    image: 'assets/img/shirt-back.webp'
+    image: 'assets/img/shirt-back.webp',
+    variants: {
+      S: { id: 67602293489909, price: 48 },
+      M: { id: 67602293522677, price: 48 },
+      L: { id: 67602293555445, price: 48 },
+      XL: { id: 67602293588213, price: 48 },
+      '2XL': { id: 67602293620981, price: 52 }
+    }
   };
+  PRODUCT.sizes = Object.keys(PRODUCT.variants);
+
+  // Resto del catálogo de Shopify. Sin foto, la tarjeta se dibuja con el refrán.
+  var COLLECTION = [
+    { title: 'Lienzo', kind: 'Acid Wash Oversized Tee', handle: 'lienzo-acid-wash-oversized-tee', from: 58,
+      image: 'https://cdn.shopify.com/s/files/1/0823/3349/9637/files/5785654-6aba4ce904a74b0a2cf5367a-ec2a5723-26bd-4ebe-82f1-f5b686c4c865.png?v=1790594586',
+      line: 'El lienzo, antes del primer trazo.' },
+    { title: 'Cría Cuervos', kind: 'Oversized Art Tee', handle: 'cria-cuervos-oversized-art-tee', from: 48,
+      line: 'Cría cuervos y te sacarán los ojos.', tone: 'cream' },
+    { title: 'Ojo Por Ojo', kind: 'Oversized Art Tee', handle: 'ojo-por-ojo-oversized-art-tee', from: 48,
+      line: 'Ojo por ojo, y me sobra uno.', tone: 'black' },
+    { title: 'Perro Que Ladra', kind: 'Oversized Art Tee', handle: 'perro-que-ladra-oversized-art-tee', from: 48,
+      line: 'Perro que ladra no muerde.', tone: 'black' }
+  ];
   // Colores de las fachadas de las fotos de inspiración.
   var ISLAND = [
     { name: 'Turquesa', hex: '#5fd3c6' },
@@ -257,7 +280,37 @@
   })();
 
   /* ---------- Compra ---------- */
-  $('#price').textContent = money.format(PRODUCT.price);
+  var prices = PRODUCT.sizes.map(function (k) { return PRODUCT.variants[k].price; });
+  function showPrice(size) {
+    $('#price').textContent = size ? money.format(PRODUCT.variants[size].price)
+      : 'Desde ' + money.format(Math.min.apply(null, prices));
+  }
+  showPrice(null);
+
+  /* ---------- Colección ---------- */
+  (function collection() {
+    var grid = $('#collectionGrid');
+    if (!grid) return;
+    COLLECTION.forEach(function (p) {
+      var a = document.createElement('a');
+      a.className = 'product-card reveal';
+      a.href = SHOP + '/products/' + p.handle;
+      a.rel = 'noopener';
+      var media = p.image
+        ? '<img src="' + p.image + '" alt="' + p.title + '" loading="lazy">'
+        : '<div class="product-card__art product-card__art--' + p.tone + '"><span>\u201C' + p.line + '\u201D</span></div>';
+      a.innerHTML = '<div class="product-card__media">' + media + '</div>' +
+        '<div class="product-card__body"><h3>' + p.title + '</h3><p>' + p.kind + '</p>' +
+        '<p class="product-card__price">Desde ' + money.format(p.from) + '</p>' +
+        '<span class="link-arrow link-arrow--dark">Ver en la tienda</span></div>';
+      grid.appendChild(a);
+      var img = a.querySelector('img');
+      if (img) img.addEventListener('error', function () { // sin red al CDN: tarjeta tipográfica
+        img.parentNode.innerHTML = '<div class="product-card__art product-card__art--cream"><span>\u201C' + p.line + '\u201D</span></div>';
+      });
+      io.observe(a);
+    });
+  })();
 
   var buyMain = $('#buyMain');
   document.querySelectorAll('#buyThumbs button').forEach(function (b) {
@@ -280,6 +333,7 @@
     b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
     b.addEventListener('click', function () {
       chosen = s;
+      showPrice(s);
       sizes.querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-checked', String(o === b)); });
       addBtn.disabled = false;
       addBtn.textContent = 'Añadir a la bolsa';
@@ -290,7 +344,11 @@
   /* ---------- Bolsa (localStorage) ---------- */
   var KEY = 'moreno.bag';
   var bag = load();
-  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+  function load() {
+    try {
+      return (JSON.parse(localStorage.getItem(KEY)) || []).filter(function (it) { return PRODUCT.variants[it.size]; });
+    } catch (e) { return []; }
+  }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(bag)); } catch (e) { /* noop */ } }
 
   function render() {
@@ -306,13 +364,14 @@
       var li = document.createElement('li');
       li.innerHTML = '<img src="' + PRODUCT.image + '" alt=""><div>' + PRODUCT.name +
         '<small>' + PRODUCT.color + ' · Talla ' + it.size + ' · ' + it.qty + ' ud.</small></div>' +
-        '<div style="text-align:right">' + money.format(PRODUCT.price * it.qty) + '<br><button data-i="' + i + '">Eliminar</button></div>';
+        '<div style="text-align:right">' + money.format(PRODUCT.variants[it.size].price * it.qty) + '<br><button data-i="' + i + '">Eliminar</button></div>';
       list.appendChild(li);
     });
     list.querySelectorAll('button[data-i]').forEach(function (b) {
       b.addEventListener('click', function () { bag.splice(+b.dataset.i, 1); save(); render(); });
     });
-    $('#bagTotal').textContent = money.format(bag.reduce(function (n, it) { return n + it.qty * PRODUCT.price; }, 0));
+    $('#bagTotal').textContent = money.format(bag.reduce(function (n, it) { return n + it.qty * PRODUCT.variants[it.size].price; }, 0));
+    $('#checkout').disabled = !bag.length;
   }
 
   addBtn.addEventListener('click', function () {
@@ -320,6 +379,13 @@
     var found = bag.filter(function (it) { return it.size === chosen; })[0];
     if (found) found.qty++; else bag.push({ id: PRODUCT.id, size: chosen, qty: 1 });
     save(); render(); openBag(true);
+  });
+
+  // Envía la bolsa al checkout de Shopify.
+  $('#checkout').addEventListener('click', function () {
+    if (!bag.length) return;
+    var items = bag.map(function (it) { return PRODUCT.variants[it.size].id + ':' + it.qty; }).join(',');
+    window.location.href = SHOP + '/cart/' + items;
   });
 
   var bagEl = $('#bag'), scrim = $('#scrim');

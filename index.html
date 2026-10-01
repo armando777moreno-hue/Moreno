@@ -22,6 +22,7 @@
         <a href="#arte">Arte</a>
         <a href="#detalles">Detalles</a>
         <a href="#inspiracion">Inspiración</a>
+        <a href="#coleccion">Colección</a>
         <a href="#comprar">Comprar</a>
       </nav>
       <button class="bag-btn" id="bagBtn" aria-label="Abrir bolsa">
@@ -207,6 +208,16 @@
       <ul class="swatches" id="swatches"></ul>
     </section>
 
+    <!-- COLECCIÓN (catálogo de Shopify) -->
+    <section class="collection" id="coleccion">
+      <div class="section-head reveal">
+        <p class="eyebrow">Drop 001</p>
+        <h2>La colección.</h2>
+        <p class="lead">Cada pieza empieza como un lienzo en blanco.</p>
+      </div>
+      <div class="collection__grid" id="collectionGrid"></div>
+    </section>
+
     <!-- COMPRAR -->
     <section class="buy" id="comprar">
       <div class="buy__grid">
@@ -260,7 +271,8 @@
     <ul class="bag__list" id="bagList"></ul>
     <div class="bag__foot">
       <div class="bag__total"><span>Subtotal</span><strong id="bagTotal"></strong></div>
-      <button class="btn btn--block" disabled title="El pago en línea aún no está conectado">Pagar (próximamente)</button>
+      <button class="btn btn--block" id="checkout" disabled>Pagar</button>
+      <p class="bag__note">Pago seguro con Shopify.</p>
     </div>
   </aside>
 

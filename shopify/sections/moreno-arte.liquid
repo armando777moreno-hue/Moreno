@@ -1,0 +1,121 @@
+{%- comment -%}
+  MORENO.co — historia de la obra con scroll pegajoso: el sol (dibujado en canvas)
+  baja mientras aparecen las frases y la pintura crece. Estilo apple.com.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section class="marte" data-moreno-arte style="--marte-h: {{ s.scroll_length }}vh;">
+  <div class="marte__pin">
+    <canvas class="marte__sky" aria-hidden="true"></canvas>
+    <div class="marte__grid">
+      <div>
+        {%- if s.eyebrow != blank -%}<p class="marte__eyebrow">{{ s.eyebrow | escape }}</p>{%- endif -%}
+        <h2 class="marte__title">
+          {%- if s.line_1 != blank -%}<span class="marte__line">{{ s.line_1 | escape }}</span>{%- endif -%}
+          {%- if s.line_2 != blank -%}<span class="marte__line">{{ s.line_2 | escape }}</span>{%- endif -%}
+          {%- if s.line_3 != blank -%}<span class="marte__line marte__line--sun">{{ s.line_3 | escape }}</span>{%- endif -%}
+        </h2>
+      </div>
+      <figure class="marte__frame">
+        {%- if s.image != blank -%}
+          {{ s.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: s.image.alt }}
+        {%- else -%}
+          <img src="{{ 'moreno-print-art.jpg' | asset_url }}" alt="Detalle del estampado: un lienzo en un caballete con unas manos, una taza de café y el sol cayendo sobre el mar" loading="lazy">
+        {%- endif -%}
+      </figure>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    function init(root) {
+      if (root.dataset.ready) return;
+      root.dataset.ready = '1';
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var c = root.querySelector('.marte__sky'), ctx = c.getContext('2d');
+      var frame = root.querySelector('.marte__frame'), lines = root.querySelectorAll('.marte__line');
+      var p = 0, w = 0, h = 0, on = false;
+      function size() {
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = c.clientWidth; h = c.clientHeight; c.width = w * dpr; c.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      function progress() {
+        var r = root.getBoundingClientRect(), vh = window.innerHeight;
+        p = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height - vh)));
+        lines.forEach(function (l, i) { l.classList.toggle('is-on', p > i * 0.22 + 0.05); });
+        frame.style.setProperty('--s', String(0.82 + p * 0.26));
+        frame.style.setProperty('--r', (-3 + p * 3) + 'deg');
+      }
+      function draw(t) {
+        var hz = h * 0.68, k = 1 - p;
+        var g = ctx.createLinearGradient(0, 0, 0, hz);
+        g.addColorStop(0, 'rgb(' + Math.round(18 + 22 * k) + ',' + Math.round(22 + 18 * k) + ',' + Math.round(48 + 30 * k) + ')');
+        g.addColorStop(0.55, 'rgb(' + Math.round(120 + 90 * k) + ',' + Math.round(60 + 40 * k) + ',70)');
+        g.addColorStop(1, 'rgb(255,' + Math.round(120 + 40 * k) + ',60)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, w, hz);
+        var sx = w * (w > 833 ? 0.36 : 0.5), sy = hz - h * 0.22 + p * h * 0.26, sr = Math.min(w, h) * 0.07;
+        var glow = ctx.createRadialGradient(sx, sy, sr * 0.2, sx, sy, sr * 6);
+        glow.addColorStop(0, 'rgba(255,200,120,.55)'); glow.addColorStop(1, 'rgba(255,120,60,0)');
+        ctx.fillStyle = glow; ctx.fillRect(0, 0, w, hz);
+        ctx.save(); ctx.beginPath(); ctx.rect(0, 0, w, hz); ctx.clip();
+        ctx.fillStyle = '#ffe2a8'; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        var sea = ctx.createLinearGradient(0, hz, 0, h);
+        sea.addColorStop(0, '#2b2c4a'); sea.addColorStop(1, '#0b0a0c');
+        ctx.fillStyle = sea; ctx.fillRect(0, hz, w, h - hz);
+        for (var i = 0; i < 26; i++) {
+          var yy = hz + 6 + i * i * 0.55;
+          if (yy > h) break;
+          var ww = sr * (1.6 - i * 0.04) + Math.sin(t / 700 + i) * sr * 0.3;
+          ctx.fillStyle = 'rgba(255,170,90,' + (0.5 - i * 0.018) + ')';
+          ctx.fillRect(sx - ww / 2 + Math.sin(t / 900 + i * 1.7) * 6, yy, ww, 2);
+        }
+        ctx.fillStyle = 'rgba(8,7,10,.35)'; ctx.fillRect(0, 0, w, h);
+      }
+      function loop(t) { if (!on) return; draw(t); if (!reduce) requestAnimationFrame(loop); }
+      new IntersectionObserver(function (es) { on = es[0].isIntersecting; if (on) requestAnimationFrame(loop); }).observe(root);
+      window.addEventListener('scroll', function () { progress(); if (reduce) draw(0); }, { passive: true });
+      window.addEventListener('resize', function () { size(); progress(); draw(0); });
+      size(); progress(); draw(0);
+    }
+    function boot() { document.querySelectorAll('[data-moreno-arte]').forEach(init); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+    document.addEventListener('shopify:section:load', boot);
+  })();
+</script>
+
+{% stylesheet %}
+  .marte { position: relative; height: var(--marte-h, 260vh); background: #0b0a0c; color: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif; }
+  .marte__pin { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  .marte__sky { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .marte__grid { position: relative; height: 100%; max-width: 1080px; margin: 0 auto; padding: 0 22px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
+  .marte__eyebrow { margin: 0 0 10px; font-size: 17px; font-weight: 600; background: linear-gradient(90deg, #ff9f45, #ff5e3a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .marte__title { margin: 0; font-size: clamp(36px, 6vw, 72px); line-height: 1.05; font-weight: 700; letter-spacing: -0.025em; color: #f5f5f7; }
+  .marte__line { display: block; opacity: .18; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+  .marte__line.is-on { opacity: 1; transform: none; }
+  .marte__line--sun.is-on { background: linear-gradient(90deg, #ff9f45, #ff5e3a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .marte__frame { margin: 0; justify-self: center; height: min(64vh, 620px); aspect-ratio: 330 / 720; max-width: 100%; border-radius: 18px; overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, .5); transform: scale(var(--s, .82)) rotate(var(--r, -3deg)); }
+  .marte__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (max-width: 833px) {
+    .marte__grid { grid-template-columns: 1fr; align-content: center; text-align: center; gap: 28px; }
+    .marte__frame { height: min(46vh, 420px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .marte__line { transition: none; } }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "MORENO Arte",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "La obra" },
+    { "type": "text", "id": "line_1", "label": "Frase 1", "default": "Una ventana." },
+    { "type": "text", "id": "line_2", "label": "Frase 2", "default": "Un café." },
+    { "type": "text", "id": "line_3", "label": "Frase 3 (en color)", "default": "Un atardecer." },
+    { "type": "image_picker", "id": "image", "label": "Imagen de la obra", "info": "Vacío: usa el detalle del estampado de la Camiseta Atardecer." },
+    { "type": "range", "id": "scroll_length", "label": "Largo del scroll", "min": 150, "max": 400, "step": 10, "unit": "vh", "default": 260 }
+  ],
+  "presets": [{ "name": "MORENO Arte" }]
+}
+{% endschema %}

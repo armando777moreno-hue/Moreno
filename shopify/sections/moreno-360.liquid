@@ -1,0 +1,97 @@
+{%- comment -%}
+  MORENO.co — visor 360° de la Camiseta Atardecer (estilo apple.com).
+  Texturas en assets/moreno-shirt-*.{webp,png}; lógica en assets/moreno-viewer.js.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+<section
+  class="m360"
+  style="--m360-bg: {{ s.color_bg }}; --m360-ink: {{ s.color_ink }}; --m360-muted: {{ s.color_muted }}; --m360-pt: {{ s.padding_top }}px; --m360-pb: {{ s.padding_bottom }}px;"
+>
+  <div class="m360__head">
+    {%- if s.eyebrow != blank -%}<p class="m360__eyebrow">{{ s.eyebrow | escape }}</p>{%- endif -%}
+    {%- if s.heading != blank -%}<h2 class="m360__title">{{ s.heading | escape }}</h2>{%- endif -%}
+    {%- if s.text != blank -%}<p class="m360__lead">{{ s.text | escape }}</p>{%- endif -%}
+  </div>
+
+  <div
+    class="m360__viewer"
+    data-moreno-360
+    data-front="{{ 'moreno-shirt-front.webp' | asset_url }}"
+    data-back="{{ 'moreno-shirt-back.webp' | asset_url }}"
+    data-height="{{ 'moreno-shirt-height.png' | asset_url }}"
+  >
+    <div class="m360__stage" data-stage>
+      <canvas aria-label="Visor 3D de la camiseta. Arrastra para girar." role="img"></canvas>
+      <div class="m360__fallback" data-fallback hidden>
+        <div class="m360__flip" data-flip>
+          <img class="m360__face" src="{{ 'moreno-shirt-back.webp' | asset_url }}" alt="Espalda" loading="lazy">
+          <img class="m360__face m360__face--front" src="{{ 'moreno-shirt-front.webp' | asset_url }}" alt="Frente" loading="lazy">
+        </div>
+      </div>
+      <div class="m360__floor" aria-hidden="true"></div>
+      <div class="m360__hint" data-hint>
+        <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Arrastra para girar
+      </div>
+    </div>
+    <div class="m360__segmented" role="tablist" aria-label="Vista">
+      <button type="button" role="tab" data-view="front">Frente</button>
+      <button type="button" role="tab" data-view="side">Perfil</button>
+      <button type="button" role="tab" data-view="back" aria-selected="true">Espalda</button>
+      <button type="button" role="tab" data-view="spin" class="m360__spin" aria-label="Girar automáticamente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="{{ 'moreno-viewer.min.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .m360 { padding: var(--m360-pt) 20px var(--m360-pb); background: var(--m360-bg); color: var(--m360-ink); text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif; letter-spacing: -0.01em; }
+  .m360__eyebrow { margin: 0 0 10px; font-size: 17px; font-weight: 600; background: linear-gradient(90deg, #ff9f45, #ff5e3a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .m360__title { margin: 0; font-size: clamp(32px, 5.4vw, 56px); line-height: 1.07; font-weight: 700; letter-spacing: -0.025em; color: var(--m360-ink); }
+  .m360__lead { max-width: 640px; margin: 16px auto 0; font-size: clamp(17px, 2vw, 21px); line-height: 1.45; color: var(--m360-muted); }
+  .m360__stage { position: relative; width: min(900px, 100%); aspect-ratio: 1 / 1; max-height: 78vh; margin: 40px auto 0; border-radius: 28px; overflow: hidden;
+    background: radial-gradient(70% 60% at 50% 42%, #fff 0%, #f1ede6 55%, #e3ddd3 100%);
+    touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+  .m360__stage.is-dragging { cursor: grabbing; }
+  .m360__stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .m360__floor { position: absolute; left: 22%; right: 22%; bottom: 7%; height: 7%; border-radius: 50%; background: radial-gradient(closest-side, rgba(60, 45, 30, .28), transparent); pointer-events: none; }
+  .m360__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--m360-muted);
+    padding: 8px 14px; border-radius: 980px; background: rgba(255, 255, 255, .7); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: opacity .6s ease; pointer-events: none; }
+  .m360__hint svg { width: 34px; height: 14px; }
+  .m360__hint.is-hidden { opacity: 0; }
+  .m360__fallback { position: absolute; inset: 6%; perspective: 1600px; }
+  .m360__flip { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 1s ease; }
+  .m360__face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; backface-visibility: hidden; }
+  .m360__face--front { transform: rotateY(180deg); }
+  .m360__segmented { display: inline-flex; gap: 4px; margin-top: 28px; padding: 4px; border-radius: 980px; background: rgba(0, 0, 0, .06); }
+  .m360__segmented button { border: 0; background: transparent; padding: 8px 18px; border-radius: 980px; font: inherit; font-size: 14px; font-weight: 500; color: var(--m360-muted); cursor: pointer; transition: background .25s, color .25s, box-shadow .25s; }
+  .m360__segmented button[aria-selected='true'] { background: #fff; color: var(--m360-ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .1); }
+  .m360__spin { display: grid; place-items: center; padding: 8px 12px !important; }
+  .m360__spin svg { width: 18px; height: 18px; }
+  @media (max-width: 560px) { .m360__segmented button { padding: 8px 14px; } }
+  @media (prefers-reduced-motion: reduce) { .m360__flip, .m360__hint { transition: none; } }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "MORENO 360°",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "360°" },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Gírala. Mírala por todos lados." },
+    { "type": "text", "id": "text", "label": "Texto", "default": "Arrastra para rotar la camiseta. Frente limpio con el logo, espalda con la obra completa." },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_bg", "label": "Fondo", "default": "#F5F5F7" },
+    { "type": "color", "id": "color_ink", "label": "Texto", "default": "#1D1D1F" },
+    { "type": "color", "id": "color_muted", "label": "Texto secundario", "default": "#6E6E73" },
+    { "type": "header", "content": "Espacio" },
+    { "type": "range", "id": "padding_top", "label": "Arriba", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Abajo", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 88 }
+  ],
+  "presets": [{ "name": "MORENO 360°" }]
+}
+{% endschema %}
