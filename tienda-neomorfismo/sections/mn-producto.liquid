@@ -14,7 +14,10 @@
         {%- assign color_inicial = '' -%}
         {%- for o in v_actual.options -%}
           {%- assign k = o | split: '·' | last | handleize -%}
-          {%- if s.tonos contains k -%}{%- assign color_inicial = k -%}{%- endif -%}
+          {%- for t in tonos -%}
+            {%- assign tk = t | split: ':' | first | strip -%}
+            {%- if tk == k -%}{%- assign color_inicial = k -%}{%- endif -%}
+          {%- endfor -%}
         {%- endfor -%}
         {%- if color_inicial == blank -%}{%- assign color_inicial = 'sand' -%}{%- endif -%}
         {%- assign tex = 'moreno-lienzo-COLOR.webp' | asset_url | replace: 'COLOR', '{c}' -%}
@@ -67,6 +70,7 @@
         <input type="hidden" name="id" value="{{ v_actual.id }}">
         {%- unless product.has_only_default_variant -%}
           {%- for option in product.options_with_values -%}
+            {%- assign oi = forloop.index0 -%}
             {%- assign es_talla = false -%}
             {%- if option.name == 'Size' or option.name == 'Talla' -%}{%- assign es_talla = true -%}{%- endif -%}
             {%- assign es_color = false -%}
@@ -89,7 +93,7 @@
                   {%- endfor -%}
                 {%- endif -%}
                 <label class="mn-chip">
-                  <input type="radio" name="mn-opcion-{{ section.id }}-{{ forloop.parentloop.index0 }}" value="{{ value | escape }}"
+                  <input type="radio" name="mn-opcion-{{ section.id }}-{{ oi }}" value="{{ value | escape }}"
                     {% if option.selected_value == value %}checked{% endif %}>
                   <span>{%- if hex != blank -%}<i style="--sw: {{ hex }}"></i>{%- endif -%}{{ value }}</span>
                 </label>
@@ -120,8 +124,9 @@
                 {%- assign filas = s.tabla_tallas | newline_to_br | split: '<br />' -%}
                 <table class="mn-tallas">
                   {%- for fila in filas -%}
+                    {%- assign primera = forloop.first -%}
                     {%- assign celdas = fila | strip | split: '|' -%}
-                    <tr>{%- for c in celdas -%}{%- if forloop.parentloop.first -%}<th>{{ c | strip }}</th>{%- else -%}<td>{{ c | strip }}</td>{%- endif -%}{%- endfor -%}</tr>
+                    <tr>{%- for c in celdas -%}{%- if primera -%}<th>{{ c | strip }}</th>{%- else -%}<td>{{ c | strip }}</td>{%- endif -%}{%- endfor -%}</tr>
                   {%- endfor -%}
                 </table>
               {%- endif -%}

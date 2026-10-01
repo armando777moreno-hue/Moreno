@@ -165,6 +165,8 @@
         var p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
         return scrollOffset + p * scrollTurns * Math.PI * 2;
       }
+      // Empieza de frente esté donde esté el visor al cargar; el giro cuenta desde ahí.
+      if (scrollTurns) scrollOffset = angle - scrollAngle();
 
       function bump() { lastInput = performance.now(); if (hint) hint.classList.add('is-hidden'); }
 

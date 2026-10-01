@@ -12,7 +12,7 @@
       "block_order": ["p1", "p2", "p3"],
       "settings": {}
     },
-    "relacionados": { "type": "mn-bento", "settings": { "collection": "todo", "titulo": "Completa el look.", "etiqueta": "También te puede gustar", "max_productos": 4, "columnas": 4 } }
+    "relacionados": { "type": "mn-bento", "settings": { "collection": "todo", "titulo": "Completa el look.", "etiqueta": "También te puede gustar", "max_productos": 4, "columnas": 3 } }
   },
   "order": ["principal", "rueda", "detalles", "relacionados"]
 }

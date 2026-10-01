@@ -1,10 +1,10 @@
 {%- comment -%}
-  Tarjeta de producto en relieve. Parámetros: product, indice, numerar, mostrar_tallas, hover, delay.
+  Tarjeta de producto en relieve. Parámetros: product, indice, numerar, mostrar_tallas, hover, delay, span, span_m (columnas que ocupa en ordenador / móvil).
   Sin foto: tarjeta tipográfica con la primera frase en cursiva de la descripción (el refrán).
 {%- endcomment -%}
 {%- assign img1 = product.featured_media -%}
 {%- assign img2 = product.media[1] -%}
-<article class="mn-card mn-relieve mn-reveal" data-mn-tilt="7" data-delay="{{ delay | default: 0 }}">
+<article class="mn-card mn-relieve mn-reveal{% if span > 1 %} mn-card--ancha{% endif %}{% if span_m > 1 %} mn-card--ancha-m{% endif %}" data-mn-tilt="7" data-delay="{{ delay | default: 0 }}"{% if span > 1 %} style="--span: {{ span }};"{% endif %}>
   <a class="mn-card__media mn-hundido" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
     {%- if img1 -%}
       <img class="mn-card__img" src="{{ img1 | image_url: width: 900 }}" alt="{{ img1.alt | default: product.title | escape }}"

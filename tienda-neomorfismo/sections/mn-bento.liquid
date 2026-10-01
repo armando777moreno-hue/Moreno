@@ -18,10 +18,25 @@
     {%- if request.design_mode and s.collection == blank -%}
       <p class="mn-aviso-editor">Elige una colección en el panel de la derecha (ahora se muestran todas las prendas).</p>
     {%- endif -%}
+    {%- comment -%} La última tarjeta se estira si su fila queda incompleta (la primera ocupa 2×2). {%- endcomment -%}
+    {%- assign total = col.products.size -%}
+    {%- if total > s.max_productos -%}{%- assign total = s.max_productos -%}{%- endif -%}
+    {%- assign span = 1 -%}
+    {%- assign junto = s.columnas | minus: 2 | times: 2 | plus: 1 -%}
+    {%- if total > junto -%}
+      {%- assign resto = total | plus: 3 | modulo: s.columnas -%}
+      {%- if resto > 0 -%}{%- assign span = s.columnas | minus: resto | plus: 1 -%}{%- endif -%}
+    {%- endif -%}
+    {%- assign cols_m = s.columnas_movil | plus: 0 -%}
+    {%- assign span_m = 1 -%}
+    {%- assign resto_m = total | minus: 1 | modulo: cols_m -%}
+    {%- if total > 1 and resto_m > 0 -%}{%- assign span_m = cols_m -%}{%- endif -%}
     <div class="mn-bento" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
       {%- for product in col.products limit: s.max_productos -%}
         {%- assign d = forloop.index | modulo: 6 -%}
-        {%- render 'mn-tarjeta', product: product, indice: forloop.index, numerar: s.numerar, mostrar_tallas: s.mostrar_tallas, hover: s.hover_segunda_foto, delay: d -%}
+        {%- assign sp = 1 -%}{%- assign sp_m = 1 -%}
+        {%- if forloop.last -%}{%- assign sp = span -%}{%- assign sp_m = span_m -%}{%- endif -%}
+        {%- render 'mn-tarjeta', product: product, indice: forloop.index, numerar: s.numerar, mostrar_tallas: s.mostrar_tallas, hover: s.hover_segunda_foto, delay: d, span: sp, span_m: sp_m -%}
       {%- else -%}
         {%- if request.design_mode -%}<p class="mn-aviso-editor">Esta colección aún no tiene prendas.</p>{%- endif -%}
       {%- endfor -%}

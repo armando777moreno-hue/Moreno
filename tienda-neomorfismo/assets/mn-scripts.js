@@ -189,7 +189,14 @@
   }
 
   /* ---------- Página de producto: variantes, visor y barra fija ---------- */
-  function money(cents, el) {
+  // Reutiliza el formato que ya imprimió Shopify (filtro money), cambiando solo la cifra.
+  function money(cents, el, plantilla) {
+    var m = plantilla && plantilla.match(/\d[\d.,\s]*\d|\d/);
+    if (m) {
+      var coma = /\d,\d{2}$/.test(m[0]), n = (cents / 100).toFixed(2).split('.');
+      var ent = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, coma ? '.' : ',');
+      return plantilla.replace(m[0], ent + (coma ? ',' : '.') + n[1]);
+    }
     var cur = (window.Shopify && Shopify.currency && Shopify.currency.active) || el.dataset.moneda || 'USD';
     try { return new Intl.NumberFormat(document.documentElement.lang || 'es', { style: 'currency', currency: cur }).format(cents / 100); }
     catch (e) { return (cents / 100).toFixed(2); }
@@ -209,6 +216,7 @@
       var fieldsets = sec.querySelectorAll('.mn-opcion');
       var visor = sec.querySelector('[data-moreno-360]');
       var barra = sec.querySelector('.mn-barra'), barraPrecio = barra && barra.querySelector('[data-mn-barra-precio]');
+      var plantilla = precio && precio.firstChild ? String(precio.firstChild.nodeValue).trim() : '';
       function seleccion() {
         return Array.prototype.map.call(fieldsets, function (fs) {
           var c = fs.querySelector('input:checked'); return c ? c.value : null;
@@ -231,7 +239,7 @@
         idInput.value = v.id;
         btn.disabled = !v.available;
         btn.textContent = v.available ? btn.dataset.anadir : btn.dataset.agotado;
-        var txt = money(v.price, sec);
+        var txt = money(v.price, sec, plantilla);
         if (precio) precio.firstChild.nodeValue = txt + ' ';
         if (barraPrecio) barraPrecio.textContent = txt;
         if (history.replaceState && origen) {

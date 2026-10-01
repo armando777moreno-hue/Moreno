@@ -1,6 +1,6 @@
 {
   "sections": {
-    "principal": { "type": "mn-coleccion", "settings": {} },
+    "principal": { "type": "mn-coleccion", "settings": { "columnas": 4 } },
     "banda": {
       "type": "mn-marquesina",
       "blocks": {

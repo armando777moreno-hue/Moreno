@@ -18,6 +18,7 @@ python3 tools/build_assets.py      # La Perla photos (+ the unused Atardecer ass
 
 # After changing js/viewer.js, regenerate the theme copy
 npx terser@5 js/viewer.js -c -m --comments false -o shopify/assets/moreno-viewer.min.js
+cp shopify/assets/moreno-viewer.min.js tienda-neomorfismo/assets/mn-viewer.min.js
 ```
 
 There is no test suite or linter. Verify changes in a browser. For headless checks, Playwright's Chromium needs `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader` for WebGL. `[data-moreno-360][data-ready]` becomes `webgl` or `fallback` once the viewer has initialized. The sandbox can't reach `cdn.shopify.com` or the store domain, so Shopify-hosted images don't load in local screenshots.
@@ -58,6 +59,15 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
     - `URL` bodies work from raw.githubusercontent.com (public repo, pin a commit SHA) and keep the exact bytes; verify with `checksumMd5`.
     - `URL` bodies pointing to Shopify Files get re-encoded, and text from there silently fails.
     - The Admin API can't write to the live (MAIN) theme.
+- `tienda-neomorfismo/` is a second, complete Shopify theme layer in a neumorphism style: the **unpublished** theme "MORENO.co — Neomorfismo" (id 188811837685), a Horizon duplicate whose home, product, collection and footer are replaced by custom `mn-` sections. `ESTADO.md` there lists every file and what is still pending.
+  - Everything is prefixed `mn-`. `assets/mn-styles.css` holds the tokens (`--mn-fondo` #E9E4DC sand, raised/inset dual shadows, `--mn-acento` sunset orange). `assets/mn-scripts.js` is one guarded IIFE that re-inits on `shopify:section:load`.
+  - Scroll effects run in one rAF loop: `track(el, fn)` gets `p` (-1 below … 1 above the viewport center) only while the element is near the screen. `[data-mn-3d]` gets `--mn-p` for CSS 3D tilt. `[data-mn-hero]`, `[data-mn-parallax]`, `[data-mn-cierre]` and the word-by-word `.mn-frase` have their own handlers.
+  - The hero uses the same viewer with `data-scroll="<turns>"`, which turns the garment with scroll progress, starting from the front wherever it sits on load.
+  - `mn-producto` builds option chips from `options_with_values`, matches the selection against the `product.variants | json` script, and reuses the server-rendered `money` text as the price format. It syncs the viewer through `morenoSetColor`.
+  - The templates are `index.json`, `product.lienzo.json` (Lienzo), `product.mn.json` (the three Drop 001 art tees, `templateSuffix: mn`) and `collection(.mn).json`. `sections/footer-group.json` replaces the footer with `mn-footer`. The bento and the color wheel read the collection `todo` and the Lienzo product.
+  - Liquid loops use an explicit index variable rather than `forloop.parentloop`.
+  - The Lienzo textures are uploaded to this theme too, as `moreno-lienzo-<key>.webp` / `-h.png`.
+  - Headless preview: render the templates with liquidjs and mocked `product`/`collection` objects (Shopify can't be reached from the sandbox), map `asset_url` to the local files, then screenshot with Playwright.
 - `css/styles.css` uses design tokens in `:root` (ink/mist/sand palette, `--sun-*` accents, `--radius`, `--nav-h`). Breakpoints are 833px and 560px. `prefers-reduced-motion` disables the animations.
 
 ## Brand
