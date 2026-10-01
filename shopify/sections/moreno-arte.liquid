@@ -1,6 +1,6 @@
 {%- comment -%}
-  MORENO.co — historia de la obra con scroll pegajoso: el sol (dibujado en canvas)
-  baja mientras aparecen las frases y la pintura crece. Estilo apple.com.
+  MORENO.co — historia con scroll pegajoso: el sol (dibujado en canvas) baja mientras
+  aparecen las frases y la imagen crece. Estilo apple.com.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
 <section class="marte" data-moreno-arte style="--marte-h: {{ s.scroll_length }}vh;">
@@ -19,7 +19,7 @@
         {%- if s.image != blank -%}
           {{ s.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: s.image.alt }}
         {%- else -%}
-          <img src="{{ 'moreno-print-art.jpg' | asset_url }}" alt="Detalle del estampado: un lienzo en un caballete con unas manos, una taza de café y el sol cayendo sobre el mar" loading="lazy">
+          <img src="{{ 'moreno-lienzo-detail-wash.jpg' | asset_url }}" alt="Primer plano del lavado ácido de la tela" loading="lazy">
         {%- endif -%}
       </figure>
     </div>
@@ -95,12 +95,12 @@
   .marte__line { display: block; opacity: .18; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
   .marte__line.is-on { opacity: 1; transform: none; }
   .marte__line--sun.is-on { background: linear-gradient(90deg, #ff9f45, #ff5e3a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .marte__frame { margin: 0; justify-self: center; height: min(64vh, 620px); aspect-ratio: 330 / 720; max-width: 100%; border-radius: 18px; overflow: hidden;
+  .marte__frame { margin: 0; justify-self: center; height: min(60vh, 560px); aspect-ratio: 1 / 1; max-width: 100%; border-radius: 18px; overflow: hidden;
     box-shadow: 0 40px 80px rgba(0, 0, 0, .5); transform: scale(var(--s, .82)) rotate(var(--r, -3deg)); }
   .marte__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
   @media (max-width: 833px) {
     .marte__grid { grid-template-columns: 1fr; align-content: center; text-align: center; gap: 28px; }
-    .marte__frame { height: min(46vh, 420px); }
+    .marte__frame { height: min(40vh, 360px); }
   }
   @media (prefers-reduced-motion: reduce) { .marte__line { transition: none; } }
 {% endstylesheet %}
@@ -109,11 +109,11 @@
 {
   "name": "MORENO Arte",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "La obra" },
-    { "type": "text", "id": "line_1", "label": "Frase 1", "default": "Una ventana." },
-    { "type": "text", "id": "line_2", "label": "Frase 2", "default": "Un café." },
-    { "type": "text", "id": "line_3", "label": "Frase 3 (en color)", "default": "Un atardecer." },
-    { "type": "image_picker", "id": "image", "label": "Imagen de la obra", "info": "Vacío: usa el detalle del estampado de la Camiseta Atardecer." },
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "El lienzo" },
+    { "type": "text", "id": "line_1", "label": "Frase 1", "default": "Algodón pesado." },
+    { "type": "text", "id": "line_2", "label": "Frase 2", "default": "Lavado ácido." },
+    { "type": "text", "id": "line_3", "label": "Frase 3 (en color)", "default": "Ninguna igual." },
+    { "type": "image_picker", "id": "image", "label": "Imagen de la obra", "info": "Vacío: usa el detalle del lavado ácido de Lienzo." },
     { "type": "range", "id": "scroll_length", "label": "Largo del scroll", "min": 150, "max": 400, "step": 10, "unit": "vh", "default": 260 }
   ],
   "presets": [{ "name": "MORENO Arte" }]

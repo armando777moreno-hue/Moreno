@@ -5,29 +5,13 @@
   // Tienda Shopify: el pago se hace en su checkout mediante enlaces de carrito
   // (/cart/<variante>:<cantidad>), así que no hace falta ninguna clave.
   var SHOP = 'https://autods-user-store-52230-g0uyjwy5.myshopify.com';
-
-  // Producto "Atardecer — Oversized Art Tee" en Shopify (IDs de variante por talla).
-  var PRODUCT = {
-    id: 'atardecer-oversized-art-tee',
-    name: 'Camiseta Atardecer',
-    color: 'Crema',
-    currency: 'USD',
-    image: 'assets/img/shirt-back.webp',
-    variants: {
-      S: { id: 67602293489909, price: 48 },
-      M: { id: 67602293522677, price: 48 },
-      L: { id: 67602293555445, price: 48 },
-      XL: { id: 67602293588213, price: 48 },
-      '2XL': { id: 67602293620981, price: 52 }
-    }
-  };
-  PRODUCT.sizes = Object.keys(PRODUCT.variants);
+  var CURRENCY = 'USD';
+  // Producto principal: "Lienzo — Acid Wash Oversized Tee" (importado desde AutoDS).
+  // Colores, sets, tallas, precios e IDs de variante viven en data/lienzo.json.
+  var PRODUCT_DATA = 'data/lienzo.json';
 
   // Resto del catálogo de Shopify. Sin foto, la tarjeta se dibuja con el refrán.
   var COLLECTION = [
-    { title: 'Lienzo', kind: 'Acid Wash Oversized Tee', handle: 'lienzo-acid-wash-oversized-tee', from: 58,
-      image: 'https://cdn.shopify.com/s/files/1/0823/3349/9637/files/5785654-6aba4ce904a74b0a2cf5367a-ec2a5723-26bd-4ebe-82f1-f5b686c4c865.png?v=1790594586',
-      line: 'El lienzo, antes del primer trazo.' },
     { title: 'Cría Cuervos', kind: 'Oversized Art Tee', handle: 'cria-cuervos-oversized-art-tee', from: 48,
       line: 'Cría cuervos y te sacarán los ojos.', tone: 'cream' },
     { title: 'Ojo Por Ojo', kind: 'Oversized Art Tee', handle: 'ojo-por-ojo-oversized-art-tee', from: 48,
@@ -48,7 +32,7 @@
   ];
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var money = new Intl.NumberFormat('es-PR', { style: 'currency', currency: PRODUCT.currency });
+  var money = new Intl.NumberFormat('es-PR', { style: 'currency', currency: CURRENCY });
   var $ = function (s) { return document.querySelector(s); };
 
   /* ---------- Revelados ---------- */
@@ -279,14 +263,6 @@
     }, { passive: true });
   })();
 
-  /* ---------- Compra ---------- */
-  var prices = PRODUCT.sizes.map(function (k) { return PRODUCT.variants[k].price; });
-  function showPrice(size) {
-    $('#price').textContent = size ? money.format(PRODUCT.variants[size].price)
-      : 'Desde ' + money.format(Math.min.apply(null, prices));
-  }
-  showPrice(null);
-
   /* ---------- Colección ---------- */
   (function collection() {
     var grid = $('#collectionGrid');
@@ -312,81 +288,133 @@
     });
   })();
 
-  var buyMain = $('#buyMain');
-  document.querySelectorAll('#buyThumbs button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('#buyThumbs button').forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
-      buyMain.style.opacity = '0';
-      setTimeout(function () {
-        buyMain.src = b.dataset.src;
-        buyMain.alt = 'Camiseta Atardecer, ' + b.dataset.alt.toLowerCase();
-        buyMain.classList.toggle('is-contain', /\.webp$/.test(b.dataset.src));
-        buyMain.style.opacity = '1';
-      }, 180);
-    });
+  /* ---------- Compra y bolsa ---------- */
+  fetch(PRODUCT_DATA).then(function (r) { return r.json(); }).then(shop).catch(function () {
+    $('#addToBag').textContent = 'No disponible';
   });
 
-  var chosen = null, addBtn = $('#addToBag'), sizes = $('#sizes');
-  PRODUCT.sizes.forEach(function (s) {
-    var b = document.createElement('button');
-    b.type = 'button'; b.textContent = s;
-    b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
-    b.addEventListener('click', function () {
-      chosen = s;
-      showPrice(s);
-      sizes.querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-checked', String(o === b)); });
-      addBtn.disabled = false;
-      addBtn.textContent = 'Añadir a la bolsa';
-    });
-    sizes.appendChild(b);
-  });
+  function shop(P) {
+    // Cada opción (color suelto o set) -> { key, name, base, price[], ids[] }
+    var options = {};
+    P.colors.forEach(function (c) { c.base = c.key; options[c.key] = c; });
+    P.sets.forEach(function (c) { options[c.key] = c; });
+    var swatch = {};
+    document.querySelectorAll('#viewer360 [data-c]').forEach(function (b) { swatch[b.dataset.c] = b.style.getPropertyValue('--sw'); });
 
-  /* ---------- Bolsa (localStorage) ---------- */
-  var KEY = 'moreno.bag';
-  var bag = load();
-  function load() {
-    try {
-      return (JSON.parse(localStorage.getItem(KEY)) || []).filter(function (it) { return PRODUCT.variants[it.size]; });
-    } catch (e) { return []; }
-  }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(bag)); } catch (e) { /* noop */ } }
+    var viewer = $('#viewer360');
+    var state = { opt: 'sand', size: null };
+    var addBtn = $('#addToBag'), buyMain = $('#buyMain');
 
-  function render() {
-    var count = bag.reduce(function (n, it) { return n + it.qty; }, 0);
-    var badge = $('#bagCount');
-    badge.hidden = !count; badge.textContent = count;
-    var list = $('#bagList');
-    list.innerHTML = '';
-    if (!bag.length) {
-      list.innerHTML = '<li class="bag__empty">Tu bolsa está vacía.</li>';
+    function variant(optKey, size) {
+      var o = options[optKey], i = P.sizes.indexOf(size);
+      return { id: o.ids[i], price: i < 4 ? o.price[0] : o.price[1] };
     }
-    bag.forEach(function (it, i) {
-      var li = document.createElement('li');
-      li.innerHTML = '<img src="' + PRODUCT.image + '" alt=""><div>' + PRODUCT.name +
-        '<small>' + PRODUCT.color + ' · Talla ' + it.size + ' · ' + it.qty + ' ud.</small></div>' +
-        '<div style="text-align:right">' + money.format(PRODUCT.variants[it.size].price * it.qty) + '<br><button data-i="' + i + '">Eliminar</button></div>';
-      list.appendChild(li);
+    function imageOf(o) { return o.base ? 'assets/img/lienzo/' + o.base + '.webp' : null; }
+    function render() {
+      var o = options[state.opt];
+      $('#colorName').textContent = o.name;
+      $('#price').textContent = state.size ? money.format(variant(state.opt, state.size).price)
+        : 'Desde ' + money.format(o.price[0]);
+      document.querySelectorAll('#colorPick button, #setPick button').forEach(function (b) {
+        b.setAttribute('aria-checked', String(b.dataset.opt === state.opt));
+      });
+      var src = imageOf(o), main = buyMain.parentNode;
+      main.classList.toggle('is-set', o.key.indexOf('set') === 0);
+      main.style.setProperty('--sw', o.base ? swatch[o.base] : '#6b6a45');
+      if (src) { buyMain.hidden = false; buyMain.src = src; buyMain.alt = 'Lienzo ' + o.name; } else { buyMain.hidden = true; }
+      main.dataset.label = o.key.indexOf('set') === 0 ? o.name : '';
+      addBtn.disabled = !state.size;
+      addBtn.textContent = state.size ? 'Añadir a la bolsa' : 'Elige una talla';
+    }
+    function pick(key, fromViewer) {
+      state.opt = key; render();
+      var base = options[key].base;
+      if (!fromViewer && base && viewer && viewer.morenoSetColor) viewer.morenoSetColor(base);
+    }
+
+    function chip(o, parent, isSet) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.dataset.opt = o.key; b.setAttribute('role', 'radio');
+      b.setAttribute('aria-label', o.name);
+      if (isSet) { b.textContent = o.name.replace('Set ', ''); b.className = 'set-chip'; }
+      b.style.setProperty('--sw', o.base ? swatch[o.base] : '#6b6a45');
+      b.addEventListener('click', function () { pick(o.key); });
+      parent.appendChild(b);
+    }
+    P.colors.forEach(function (o) { chip(o, $('#colorPick'), false); });
+    P.sets.forEach(function (o) { chip(o, $('#setPick'), true); });
+
+    P.sizes.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = s;
+      b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+      b.addEventListener('click', function () {
+        state.size = s;
+        $('#sizes').querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-checked', String(o === b)); });
+        render();
+      });
+      $('#sizes').appendChild(b);
     });
-    list.querySelectorAll('button[data-i]').forEach(function (b) {
-      b.addEventListener('click', function () { bag.splice(+b.dataset.i, 1); save(); render(); });
+
+    // El visor y la ficha de compra comparten el color elegido.
+    if (viewer) viewer.addEventListener('moreno:color', function (e) {
+      var name = options[e.detail] ? options[e.detail].name : e.detail;
+      $('#viewerColorName').textContent = name;
+      pick(e.detail, true);
     });
-    $('#bagTotal').textContent = money.format(bag.reduce(function (n, it) { return n + it.qty * PRODUCT.variants[it.size].price; }, 0));
-    $('#checkout').disabled = !bag.length;
+
+    /* Bolsa (localStorage) */
+    var KEY = 'moreno.bag.v2';
+    var bag = load();
+    function load() {
+      try {
+        return (JSON.parse(localStorage.getItem(KEY)) || []).filter(function (it) {
+          return options[it.opt] && P.sizes.indexOf(it.size) >= 0;
+        });
+      } catch (e) { return []; }
+    }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(bag)); } catch (e) { /* noop */ } }
+    function line(it) { return variant(it.opt, it.size).price * it.qty; }
+
+    function renderBag() {
+      var count = bag.reduce(function (n, it) { return n + it.qty; }, 0);
+      var badge = $('#bagCount');
+      badge.hidden = !count; badge.textContent = count;
+      var list = $('#bagList');
+      list.innerHTML = '';
+      if (!bag.length) list.innerHTML = '<li class="bag__empty">Tu bolsa está vacía.</li>';
+      bag.forEach(function (it, i) {
+        var o = options[it.opt], img = imageOf(o);
+        var li = document.createElement('li');
+        li.innerHTML = (img ? '<img src="' + img + '" alt="">' : '<span class="bag__dot" style="background:#6b6a45"></span>') +
+          '<div>Lienzo<small>' + o.name + ' · Talla ' + it.size + ' · ' + it.qty + ' ud.</small></div>' +
+          '<div style="text-align:right">' + money.format(line(it)) + '<br><button data-i="' + i + '">Eliminar</button></div>';
+        list.appendChild(li);
+      });
+      list.querySelectorAll('button[data-i]').forEach(function (b) {
+        b.addEventListener('click', function () { bag.splice(+b.dataset.i, 1); save(); renderBag(); });
+      });
+      $('#bagTotal').textContent = money.format(bag.reduce(function (n, it) { return n + line(it); }, 0));
+      $('#checkout').disabled = !bag.length;
+    }
+
+    addBtn.addEventListener('click', function () {
+      if (!state.size) return;
+      var found = bag.filter(function (it) { return it.opt === state.opt && it.size === state.size; })[0];
+      if (found) found.qty++; else bag.push({ opt: state.opt, size: state.size, qty: 1 });
+      save(); renderBag(); openBag(true);
+    });
+
+    // Envía la bolsa al checkout de Shopify.
+    $('#checkout').addEventListener('click', function () {
+      if (!bag.length) return;
+      var items = bag.map(function (it) { return variant(it.opt, it.size).id + ':' + it.qty; }).join(',');
+      window.location.href = SHOP + '/cart/' + items;
+    });
+
+    render();
+    renderBag();
   }
-
-  addBtn.addEventListener('click', function () {
-    if (!chosen) return;
-    var found = bag.filter(function (it) { return it.size === chosen; })[0];
-    if (found) found.qty++; else bag.push({ id: PRODUCT.id, size: chosen, qty: 1 });
-    save(); render(); openBag(true);
-  });
-
-  // Envía la bolsa al checkout de Shopify.
-  $('#checkout').addEventListener('click', function () {
-    if (!bag.length) return;
-    var items = bag.map(function (it) { return PRODUCT.variants[it.size].id + ':' + it.qty; }).join(',');
-    window.location.href = SHOP + '/cart/' + items;
-  });
 
   var bagEl = $('#bag'), scrim = $('#scrim');
   function openBag(open) {
@@ -399,7 +427,17 @@
   $('#bagClose').addEventListener('click', function () { openBag(false); });
   scrim.addEventListener('click', function () { openBag(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') openBag(false); });
-  render();
+
+  /* ---------- Hero: la camiseta cambia de color sola ---------- */
+  (function heroCycle() {
+    var imgs = document.querySelectorAll('#heroShirts img'), i = 0;
+    if (reduceMotion || imgs.length < 2) return;
+    setInterval(function () {
+      imgs[i].classList.remove('is-on');
+      i = (i + 1) % imgs.length;
+      imgs[i].classList.add('is-on');
+    }, 3200);
+  })();
 
   $('#year').textContent = new Date().getFullYear();
 })();
