@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MORENO.co — Luxury Essentials</title>
+  <meta name="description" content="MORENO.co · Luxury Essentials. Camiseta Atardecer: corte oversize, tejido texturizado y arte al óleo en la espalda.">
+  <meta name="theme-color" content="#f5f5f7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navegación global -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a class="wordmark" href="#top" aria-label="MORENO.co inicio">MORENO<span>.co</span></a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="#viewer">360°</a>
+        <a href="#arte">Arte</a>
+        <a href="#detalles">Detalles</a>
+        <a href="#inspiracion">Inspiración</a>
+        <a href="#comprar">Comprar</a>
+      </nav>
+      <button class="bag-btn" id="bagBtn" aria-label="Abrir bolsa">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="bag-btn__count" id="bagCount" hidden>0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sub-nav de producto (estilo Apple) -->
+  <div class="subnav" id="subnav">
+    <div class="subnav__inner">
+      <span class="subnav__title">Camiseta Atardecer</span>
+      <div class="subnav__actions">
+        <a href="#viewer" class="subnav__link">Ver en 360°</a>
+        <a href="#comprar" class="btn btn--sm">Comprar</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero__light" aria-hidden="true"></div>
+      <div class="hero__grain" id="grain" aria-hidden="true"></div>
+      <div class="hero__copy reveal">
+        <p class="eyebrow">Nuevo · Luxury Essentials</p>
+        <h1 class="hero__title">Atardecer.</h1>
+        <p class="hero__sub">El arte, puesto.</p>
+        <div class="hero__ctas">
+          <a href="#comprar" class="btn">Comprar</a>
+          <a href="#viewer" class="link-arrow">Gírala en 360°</a>
+        </div>
+      </div>
+      <div class="hero__stage" id="heroStage">
+        <img class="hero__shirt" src="assets/img/shirt-back.webp" alt="Camiseta Atardecer de MORENO.co vista desde la espalda, con una pintura de un atardecer sobre un caballete" width="1024" height="1024">
+        <div class="hero__shadow" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- VISOR 3D -->
+    <section class="viewer" id="viewer">
+      <div class="section-head reveal">
+        <p class="eyebrow eyebrow--sun">360°</p>
+        <h2>Gírala. Mírala por todos lados.</h2>
+        <p class="lead">Arrastra para rotar la camiseta. Frente limpio con el logo, espalda con la obra completa.</p>
+      </div>
+      <div class="viewer__stage" id="viewerStage">
+        <canvas id="viewerCanvas" aria-label="Visor 3D de la camiseta. Arrastra para girar." role="img"></canvas>
+        <div class="viewer__fallback" id="viewerFallback" hidden>
+          <div class="flip" id="flip">
+            <img class="flip__face" src="assets/img/shirt-back.webp" alt="Espalda">
+            <img class="flip__face flip__face--front" src="assets/img/shirt-front.webp" alt="Frente">
+          </div>
+        </div>
+        <div class="viewer__floor" aria-hidden="true"></div>
+        <div class="viewer__hint" id="viewerHint">
+          <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Arrastra para girar
+        </div>
+      </div>
+      <div class="segmented" role="tablist" aria-label="Vista">
+        <button role="tab" data-view="front">Frente</button>
+        <button role="tab" data-view="side">Perfil</button>
+        <button role="tab" data-view="back" aria-selected="true">Espalda</button>
+        <button role="tab" data-view="spin" class="segmented__spin" aria-label="Girar automáticamente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ARTE (scroll) -->
+    <section class="art" id="arte">
+      <div class="art__pin">
+      <canvas class="art__sky" id="sky" aria-hidden="true"></canvas>
+      <div class="art__sticky">
+        <div class="art__copy">
+          <p class="eyebrow eyebrow--sun">La obra</p>
+          <h2 class="art__title">
+            <span class="art__line">Una ventana.</span>
+            <span class="art__line">Un café.</span>
+            <span class="art__line art__line--sun">Un atardecer.</span>
+          </h2>
+        </div>
+        <figure class="art__frame" id="artFrame">
+          <img src="assets/img/print-art.jpg" alt="Detalle del estampado: un lienzo en un caballete con unas manos, una taza de café y el sol cayendo sobre el mar" loading="lazy">
+        </figure>
+      </div>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section class="highlights" id="campana">
+      <div class="section-head section-head--left reveal">
+        <h2>Míralo puesto.</h2>
+      </div>
+      <div class="rail" id="rail">
+        <article class="card card--tall">
+          <img src="assets/img/model-back.jpg" alt="Modelo de espaldas con la camiseta Atardecer y gorra" loading="lazy">
+          <div class="card__caption"><strong>Corte oversize.</strong> Hombros caídos y caída amplia.</div>
+        </article>
+        <article class="card card--tall">
+          <img src="assets/img/flatlay-back.jpg" alt="Camiseta Atardecer extendida mostrando la espalda" loading="lazy">
+          <div class="card__caption"><strong>La espalda es el lienzo.</strong> Arte a todo color.</div>
+        </article>
+        <article class="card card--tall">
+          <img src="assets/img/model-back-2.jpg" alt="Modelo de espaldas, luz natural de estudio" loading="lazy">
+          <div class="card__caption"><strong>Luz de tarde.</strong> Tono crema que combina con todo.</div>
+        </article>
+        <article class="card card--tall">
+          <img src="assets/img/model-side.jpg" alt="Modelo de perfil mirando hacia abajo" loading="lazy">
+          <div class="card__caption"><strong>De perfil.</strong> Volumen relajado.</div>
+        </article>
+        <article class="card card--tall">
+          <img src="assets/img/studio-back.jpg" alt="Camiseta flotando en estudio con luz diagonal" loading="lazy">
+          <div class="card__caption"><strong>Estudio.</strong> Hecha para destacar.</div>
+        </article>
+      </div>
+      <div class="rail__controls">
+        <div class="rail__dots" id="railDots"></div>
+        <div class="rail__arrows">
+          <button class="round-btn" id="railPrev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="round-btn" id="railNext" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETALLES (bento) -->
+    <section class="details" id="detalles">
+      <div class="section-head reveal">
+        <p class="eyebrow">Detalles</p>
+        <h2>Esencial por fuera.<br>Cuidado por dentro.</h2>
+      </div>
+      <div class="bento">
+        <div class="tile tile--photo tile--wide reveal">
+          <img src="assets/img/print-detail.jpg" alt="Primer plano del estampado sobre la tela texturizada" loading="lazy">
+          <div class="tile__text tile__text--light"><h3>Pincelada a pincelada.</h3><p>El estampado conserva la textura de la pintura.</p></div>
+        </div>
+        <div class="tile tile--type reveal">
+          <span class="tile__big" id="oversizeWord">Oversize</span>
+          <p>Corte boxy, hombro caído, manga amplia.</p>
+        </div>
+        <div class="tile tile--photo reveal">
+          <img src="assets/img/collar-label.jpg" alt="Cuello acanalado con etiqueta MORENO.co talla L" loading="lazy">
+          <div class="tile__text"><h3>Cuello acanalado.</h3><p>Grueso, firme, con etiqueta tejida.</p></div>
+        </div>
+        <div class="tile tile--photo reveal">
+          <img src="assets/img/side-tag.jpg" alt="Etiqueta negra tejida en el bajo lateral con la letra M" loading="lazy">
+          <div class="tile__text"><h3>Firma en el bajo.</h3><p>Etiqueta negra tejida.</p></div>
+        </div>
+        <div class="tile tile--fabric reveal">
+          <canvas id="fabric" aria-hidden="true"></canvas>
+          <div class="tile__text"><h3>Tejido texturizado.</h3><p>Acabado lavado, tacto suave.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSPIRACIÓN -->
+    <section class="inspo" id="inspiracion">
+      <div class="inspo__media">
+        <img class="inspo__img" id="inspoImg" src="assets/img/la-perla-dusk.jpg" alt="Casas de colores junto al mar al anochecer en San Juan, Puerto Rico" loading="lazy">
+      </div>
+      <div class="inspo__copy reveal">
+        <p class="eyebrow eyebrow--sun">Inspiración</p>
+        <h2>Nacida entre colores del Caribe.</h2>
+        <p class="lead lead--light">Fachadas pastel, mar abierto y la última luz del día. De ahí sale cada pieza.</p>
+        <p class="place">San Juan, Puerto Rico</p>
+      </div>
+    </section>
+
+    <section class="palette" aria-labelledby="paletteTitle">
+      <div class="section-head reveal">
+        <h2 id="paletteTitle">La paleta de la isla.</h2>
+        <p class="lead">Una ilustración programada a partir de los colores de sus casas.</p>
+      </div>
+      <div class="palette__grid">
+        <svg class="skyline" id="skyline" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Ilustración generada de casas de colores frente al mar"></svg>
+        <figure class="palette__night reveal">
+          <img src="assets/img/la-perla-night.jpg" alt="Casas de colores iluminadas de noche bajo la luna" loading="lazy">
+        </figure>
+      </div>
+      <ul class="swatches" id="swatches"></ul>
+    </section>
+
+    <!-- COMPRAR -->
+    <section class="buy" id="comprar">
+      <div class="buy__grid">
+        <div class="buy__gallery">
+          <div class="buy__main"><img id="buyMain" src="assets/img/studio-back.jpg" alt="Camiseta Atardecer, vista trasera"></div>
+          <div class="buy__thumbs" id="buyThumbs">
+            <button aria-pressed="true" data-src="assets/img/studio-back.jpg" data-alt="Vista trasera"><img src="assets/img/studio-back.jpg" alt=""><span>Trasera</span></button>
+            <button data-src="assets/img/shirt-front.webp" data-alt="Vista frontal"><img src="assets/img/shirt-front.webp" alt=""><span>Frontal</span></button>
+            <button data-src="assets/img/model-side.jpg" data-alt="Vista lateral"><img src="assets/img/model-side.jpg" alt=""><span>Lateral</span></button>
+            <button data-src="assets/img/collar-label.jpg" data-alt="Detalle del cuello"><img src="assets/img/collar-label.jpg" alt=""><span>Cuello</span></button>
+            <button data-src="assets/img/side-tag.jpg" data-alt="Detalle de la etiqueta"><img src="assets/img/side-tag.jpg" alt=""><span>Etiqueta</span></button>
+          </div>
+        </div>
+        <div class="buy__panel">
+          <p class="eyebrow">Nuevo</p>
+          <h2 class="buy__title">Camiseta Atardecer</h2>
+          <p class="buy__price" id="price"></p>
+          <div class="field">
+            <span class="field__label">Color · <strong>Crema</strong></span>
+            <div class="swatch-pick"><span class="swatch-pick__dot" aria-hidden="true"></span></div>
+          </div>
+          <div class="field">
+            <span class="field__label">Talla</span>
+            <div class="sizes" id="sizes" role="radiogroup" aria-label="Talla"></div>
+          </div>
+          <button class="btn btn--block" id="addToBag" disabled>Elige una talla</button>
+          <ul class="buy__notes">
+            <li>Corte oversize: si prefieres un ajuste clásico, pide una talla menos.</li>
+            <li>Lavar del revés, en frío.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <a class="wordmark wordmark--dark" href="#top">MORENO<span>.co</span></a>
+      <p class="footer__tag">Luxury Essentials</p>
+      <p class="footer__copy">© <span id="year"></span> MORENO.co. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Bolsa -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="bag" id="bag" aria-label="Bolsa" aria-hidden="true">
+    <div class="bag__head">
+      <h2>Bolsa</h2>
+      <button class="round-btn" id="bagClose" aria-label="Cerrar bolsa"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <ul class="bag__list" id="bagList"></ul>
+    <div class="bag__foot">
+      <div class="bag__total"><span>Subtotal</span><strong id="bagTotal"></strong></div>
+      <button class="btn btn--block" disabled title="El pago en línea aún no está conectado">Pagar (próximamente)</button>
+    </div>
+  </aside>
+
+  <script src="js/vendor/three.min.js" defer></script>
+  <script src="js/viewer.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>
