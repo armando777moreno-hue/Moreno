@@ -1,0 +1,41 @@
+{%- comment -%}
+  Tarjeta de producto en relieve. Parámetros: product, indice, numerar, mostrar_tallas, hover, delay, span, span_m (columnas que ocupa en ordenador / móvil).
+  Sin foto: tarjeta tipográfica con la primera frase en cursiva de la descripción (el refrán).
+{%- endcomment -%}
+{%- assign img1 = product.featured_media -%}
+{%- assign img2 = product.media[1] -%}
+<article class="mn-card mn-relieve mn-reveal{% if span > 1 %} mn-card--ancha{% endif %}{% if span_m > 1 %} mn-card--ancha-m{% endif %}" data-mn-tilt="7" data-delay="{{ delay | default: 0 }}"{% if span > 1 %} style="--span: {{ span }};"{% endif %}>
+  <a class="mn-card__media mn-hundido" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+    {%- if img1 -%}
+      <img class="mn-card__img" src="{{ img1 | image_url: width: 900 }}" alt="{{ img1.alt | default: product.title | escape }}"
+        loading="lazy" width="{{ img1.preview_image.width }}" height="{{ img1.preview_image.height }}">
+      {%- if hover and img2 -%}
+        <img class="mn-card__img mn-card__img--hover" src="{{ img2 | image_url: width: 900 }}" alt="" loading="lazy">
+      {%- endif -%}
+    {%- else -%}
+      {%- assign frase = product.description | split: '</em>' | first | strip_html | strip -%}
+      {%- if frase == blank or frase.size > 90 -%}{%- assign frase = product.title | split: '—' | first | strip -%}{%- endif -%}
+      <span class="mn-card__frase">“{{ frase }}”</span>
+    {%- endif -%}
+    {%- if numerar -%}<span class="mn-card__num mn-etiqueta">{{ indice | prepend: '0' | slice: -2, 2 }}</span>{%- endif -%}
+    {%- if product.compare_at_price > product.price -%}
+      <span class="mn-card__badge mn-relieve">OFERTA</span>
+    {%- elsif product.available == false -%}
+      <span class="mn-card__badge mn-relieve">AGOTADO</span>
+    {%- endif -%}
+  </a>
+  <div class="mn-card__info">
+    <h3 class="mn-card__title"><a href="{{ product.url }}">{{ product.title | split: '—' | first | strip }}</a></h3>
+    <p class="mn-card__price">
+      {%- if product.price_varies -%}desde {% endif -%}{{ product.price_min | money }}
+    </p>
+  </div>
+  {%- if mostrar_tallas -%}
+    {%- assign talla_opt = product.options_by_name['Size'] | default: product.options_by_name['Talla'] -%}
+    {%- if talla_opt -%}
+      <ul class="mn-card__tallas" aria-label="Tallas">
+        {%- for v in talla_opt.values -%}<li class="mn-hundido">{{ v }}</li>{%- endfor -%}
+      </ul>
+    {%- endif -%}
+  {%- endif -%}
+</article>

@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "principal": { "type": "mn-coleccion", "settings": { "columnas": 4 } },
+    "banda": {
+      "type": "mn-marquesina",
+      "blocks": {
+        "f1": { "type": "frase", "settings": { "texto": "Lavado ácido" } },
+        "f2": { "type": "frase", "settings": { "texto": "Once colores" } },
+        "f3": { "type": "frase", "settings": { "texto": "Drop 001 — Refranes" } }
+      },
+      "block_order": ["f1", "f2", "f3"],
+      "settings": { "padding_top": 0, "padding_bottom": 80 }
+    }
+  },
+  "order": ["principal", "banda"]
+}

@@ -1,0 +1,69 @@
+{{ 'mn-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{%- assign col = s.collection -%}
+{%- if col == blank -%}{%- assign col = collections['all'] -%}{%- endif -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<section class="mn-section mn-escena">
+  <div class="mn-container">
+    <div class="mn-head" data-mn-3d style="--mn-3d-x: 10deg;">
+      <div>
+        {%- if s.etiqueta != blank -%}<p class="mn-etiqueta">{{ s.etiqueta }}</p>{%- endif -%}
+        <h2 class="mn-display mn-head__titulo">{{ s.titulo }}</h2>
+      </div>
+      {%- if s.texto_boton != blank -%}<a class="mn-btn" href="{{ col.url | default: '/collections/all' }}">{{ s.texto_boton }} →</a>{%- endif -%}
+    </div>
+    {%- if request.design_mode and s.collection == blank -%}
+      <p class="mn-aviso-editor">Elige una colección en el panel de la derecha (ahora se muestran todas las prendas).</p>
+    {%- endif -%}
+    {%- comment -%} La última tarjeta se estira si su fila queda incompleta (la primera ocupa 2×2). {%- endcomment -%}
+    {%- assign total = col.products.size -%}
+    {%- if total > s.max_productos -%}{%- assign total = s.max_productos -%}{%- endif -%}
+    {%- assign span = 1 -%}
+    {%- assign junto = s.columnas | minus: 2 | times: 2 | plus: 1 -%}
+    {%- if total > junto -%}
+      {%- assign resto = total | plus: 3 | modulo: s.columnas -%}
+      {%- if resto > 0 -%}{%- assign span = s.columnas | minus: resto | plus: 1 -%}{%- endif -%}
+    {%- endif -%}
+    {%- assign cols_m = s.columnas_movil | plus: 0 -%}
+    {%- assign span_m = 1 -%}
+    {%- assign resto_m = total | minus: 1 | modulo: cols_m -%}
+    {%- if total > 1 and resto_m > 0 -%}{%- assign span_m = cols_m -%}{%- endif -%}
+    <div class="mn-bento" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
+      {%- for product in col.products limit: s.max_productos -%}
+        {%- assign d = forloop.index | modulo: 6 -%}
+        {%- assign sp = 1 -%}{%- assign sp_m = 1 -%}
+        {%- if forloop.last -%}{%- assign sp = span -%}{%- assign sp_m = span_m -%}{%- endif -%}
+        {%- render 'mn-tarjeta', product: product, indice: forloop.index, numerar: s.numerar, mostrar_tallas: s.mostrar_tallas, hover: s.hover_segunda_foto, delay: d, span: sp, span_m: sp_m -%}
+      {%- else -%}
+        {%- if request.design_mode -%}<p class="mn-aviso-editor">Esta colección aún no tiene prendas.</p>{%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Mosaico de prendas",
+  "tag": "div",
+  "settings": [
+    { "type": "collection", "id": "collection", "label": "Colección que se muestra" },
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "La colección" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Piezas para llevar puestas." },
+    { "type": "text", "id": "texto_boton", "label": "Texto del botón 'ver todo'", "default": "Ver todo" },
+    { "type": "range", "id": "max_productos", "label": "Cuántas prendas mostrar", "min": 2, "max": 12, "step": 1, "default": 6 },
+    { "type": "range", "id": "columnas", "label": "Columnas en ordenador", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "select", "id": "columnas_movil", "label": "Columnas en móvil", "options": [{ "value": "1", "label": "1" }, { "value": "2", "label": "2" }], "default": "2" },
+    { "type": "checkbox", "id": "numerar", "label": "Numerar las prendas (01, 02...)", "default": true },
+    { "type": "checkbox", "id": "mostrar_tallas", "label": "Mostrar las tallas", "default": false },
+    { "type": "checkbox", "id": "hover_segunda_foto", "label": "Segunda foto al pasar el ratón", "default": true },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [{ "name": "MN · Mosaico de prendas" }]
+}
+{% endschema %}

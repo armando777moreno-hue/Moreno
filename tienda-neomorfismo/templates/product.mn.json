@@ -1,0 +1,8 @@
+{
+  "sections": {
+    "principal": { "type": "mn-producto", "settings": {} },
+    "manifiesto": { "type": "mn-frase", "settings": { "etiqueta": "Drop 001 — Refranes", "frase": "Dichos de siempre, dibujados a mano y sin corregir: tal como cayó el primer trazo.", "palabras_acento": "mano, trazo" } },
+    "relacionados": { "type": "mn-bento", "settings": { "collection": "todo", "titulo": "Completa el look.", "etiqueta": "También te puede gustar", "max_productos": 4, "columnas": 3 } }
+  },
+  "order": ["principal", "manifiesto", "relacionados"]
+}

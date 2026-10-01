@@ -1,0 +1,44 @@
+{{ 'mn-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<section class="mn-section">
+  <div class="mn-container">
+    <div class="mn-marquee mn-hundido" data-dir="{{ s.direccion }}" style="--mn-vel: {{ s.velocidad }}s;" aria-label="{{ s.etiqueta_accesible | escape }}">
+      <div class="mn-marquee__track">
+        {%- for block in section.blocks -%}
+          <span class="mn-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.texto }} <span class="mn-marquee__sep" aria-hidden="true">{{ s.separador }}</span></span>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Banda en relieve",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "separador", "label": "Separador", "default": "✦" },
+    { "type": "range", "id": "velocidad", "label": "Duración de una vuelta (más = más lento)", "min": 10, "max": 90, "step": 5, "unit": "s", "default": 40 },
+    { "type": "select", "id": "direccion", "label": "Dirección", "options": [{ "value": "left", "label": "Hacia la izquierda" }, { "value": "right", "label": "Hacia la derecha" }], "default": "left" },
+    { "type": "text", "id": "etiqueta_accesible", "label": "Descripción para lectores de pantalla", "default": "Novedades de MORENO.co" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 56 }
+  ],
+  "blocks": [
+    { "type": "frase", "name": "Frase", "settings": [ { "type": "text", "id": "texto", "label": "Texto", "default": "Lavado ácido" } ] }
+  ],
+  "presets": [{ "name": "MN · Banda en relieve", "blocks": [
+    { "type": "frase", "settings": { "texto": "El lienzo, antes del primer trazo" } },
+    { "type": "frase", "settings": { "texto": "Lavado ácido" } },
+    { "type": "frase", "settings": { "texto": "Once colores" } },
+    { "type": "frase", "settings": { "texto": "Oversize unisex" } },
+    { "type": "frase", "settings": { "texto": "Drop 001 — Refranes" } }
+  ] }]
+}
+{% endschema %}
