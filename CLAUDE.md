@@ -44,7 +44,7 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
 - `tools/build_lienzo.py` turns the supplier photos (`assets/originals/lienzo/<color>.jpg`, front view on white) into `assets/img/lienzo/<color>.webp` (1024² RGBA cutout via flood-fill from the white border), `<color>-h.png` (256² height map) and `colors.json` (mean color of each photo). It also writes the bento detail crops.
   - The photos came from the Shopify product media. Because the sandbox can't reach the CDN, they were downloaded by upserting `cdn.shopify.com/...&width=1000` URLs into the unpublished theme and reading the files back as base64.
   - The supplier photos don't always match the color names (e.g. "Oxblood" is bright red, "Bone" is white). The site shows the real photos.
-- **Unused Atardecer assets**: "Atardecer — Oversized Art Tee" was a mockup-based product (DRAFT in Shopify) that is no longer sold.
+- **Unused Atardecer assets**: "Atardecer — Oversized Art Tee" was a mockup-based product that is no longer sold; it was deleted from Shopify along with its uploaded files.
   - `tools/build_assets.py` still generates its images (`shirt-*.webp`, campaign crops) plus the La Perla photos that the site does use.
   - Don't reintroduce the Atardecer images as a sellable product.
 - `shopify/` holds the Shopify theme files, kept in sync by hand with the store. They live in the **unpublished** theme "MORENO CO. — Arte 360° (borrador)", a duplicate of the live Horizon-based theme "MORENO CO. — Arte".
