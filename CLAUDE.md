@@ -26,7 +26,8 @@ There is no test suite or linter. Verify changes in a browser. For headless chec
   - scroll effects: hero shrink, art-section progress (`artProgress`), inspiration parallax
   - "programmed images" drawn in code: hero film grain, the animated sunset canvas (`#sky`), the fabric texture canvas (`#fabric`), and the generated SVG skyline of colored houses (`#skyline`)
   - the rail, the buy gallery, size selection, and the bag (persisted in `localStorage` under `moreno.bag`)
-  - Checkout is intentionally **not** wired up; the pay button is disabled.
+  - `COLLECTION`: the other Shopify products, rendered as cards linking to `SHOP/products/<handle>`. Products without a photo get a typographic card with their refrán.
+  - Checkout: "Pagar" redirects to the Shopify cart permalink `SHOP/cart/<variantId>:<qty>,...`, built from `PRODUCT.variants` (numeric variant IDs per size). It only works while the Shopify product is ACTIVE and published to the Online Store.
 - `js/viewer.js` is the rotatable 3D garment (three.js **r128** UMD, vendored in `js/vendor/`; newer three versions no longer ship `build/three.min.js`). It works like this:
   - The shirt is two subdivided planes (front and back) cut out via `alphaTest` on their RGBA textures.
   - Each plane is displaced along z by `shirt-height.png`, so the edges meet and form a closed "pillow" volume.
@@ -39,6 +40,16 @@ There is no test suite or linter. Verify changes in a browser. For headless chec
   - The height map reaches 0 slightly inside the alpha edge so the faces don't leave a gap when rotated.
   - It also erases the baked-in logo and 360° icon from the campaign photos, and crops the collage into gallery images.
   - If you change the silhouette or mask logic, re-render and inspect all four viewer angles; the edges are where it breaks.
+- `shopify/` holds the Shopify theme files, kept in sync by hand with the store. They were uploaded to the **unpublished** theme "MORENO CO. — Arte 360° (borrador)", a duplicate of the live Horizon-based theme "MORENO CO. — Arte".
+  - `sections/moreno-360.liquid` is the viewer section. It loads three r128 from cdnjs plus `assets/moreno-viewer.min.js`, and reads its textures from theme assets `moreno-shirt-{front,back}.webp` and `moreno-shirt-height.png`.
+  - `assets/moreno-viewer.js` is the multi-instance source of the viewer. Regenerate the minified file with `npx terser@5 shopify/assets/moreno-viewer.js -c -m --comments false -o shopify/assets/moreno-viewer.min.js`.
+  - `sections/moreno-arte.liquid` is the sticky sunset story section.
+  - `templates/product.atardecer.json` is a copy of the theme's `product.json` with both sections added. The Shopify product "Atardecer — Oversized Art Tee" uses `templateSuffix: atardecer`.
+  - Upload gotchas:
+    - `themeFilesUpsert` with `TEXT` works.
+    - `URL` bodies work from raw.githubusercontent.com (public repo) and keep the exact bytes; verify with `checksumMd5`.
+    - Shopify Files CDN URLs get re-encoded.
+    - The Admin API can't write to the live (MAIN) theme.
 - `css/styles.css` uses design tokens in `:root` (ink/mist/sand palette, `--sun-*` accents, `--radius`, `--nav-h`). Breakpoints are 833px and 560px. `prefers-reduced-motion` disables the animations.
 
 ## Brand
