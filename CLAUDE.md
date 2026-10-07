@@ -70,6 +70,7 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
   - The merchant edits templates in the theme editor (`templates/index.json` was re-saved there), so upload sections/assets/layout but don't overwrite templates without diffing against the store first.
   - The Lienzo textures are uploaded to this theme too, as `moreno-lienzo-<key>.webp` / `-h.png`.
   - Headless preview: render the templates with liquidjs and mocked `product`/`collection` objects (Shopify can't be reached from the sandbox), map `asset_url` to the local files, then screenshot with Playwright.
+- `printful/` holds the embroidered "Firma" line for Printful: `logo/` (MORENO.co wordmark and "M." monogram in Cormorant Garamond Bold, outlined SVG + transparent PNG, dark `tinta` and light `arena` versions) and `PRINTFUL.md` (product line, suggested prices, Spanish copy, merchant steps). There is no Printful connector: the merchant creates products in Printful and syncs them to Shopify as drafts, then they get finished via the Admin API.
 - `css/styles.css` uses design tokens in `:root` (ink/mist/sand palette, `--sun-*` accents, `--radius`, `--nav-h`). Breakpoints are 833px and 560px. `prefers-reduced-motion` disables the animations.
 
 ## Brand
