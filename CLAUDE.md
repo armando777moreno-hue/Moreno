@@ -66,6 +66,8 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
   - `mn-producto` builds option chips from `options_with_values`, matches the selection against the `product.variants | json` script, and reuses the server-rendered `money` text as the price format. It syncs the viewer through `morenoSetColor`.
   - The templates are `index.json`, `product.lienzo.json` (Lienzo), `product.mn.json` (the three Drop 001 art tees, `templateSuffix: mn`) and `collection(.mn).json`. `sections/footer-group.json` replaces the footer with `mn-footer`. The bento and the color wheel read the collection `todo` and the Lienzo product.
   - Liquid loops use an explicit index variable rather than `forloop.parentloop`.
+  - `layout/theme.liquid` is Horizon's layout plus 4 head lines (Google Fonts preconnect + stylesheet, `mn-styles.css` once); sections no longer include the stylesheet themselves. Colors that carry text use `--mn-acento-texto`; `--mn-acento` is decoration only.
+  - The merchant edits templates in the theme editor (`templates/index.json` was re-saved there), so upload sections/assets/layout but don't overwrite templates without diffing against the store first.
   - The Lienzo textures are uploaded to this theme too, as `moreno-lienzo-<key>.webp` / `-h.png`.
   - Headless preview: render the templates with liquidjs and mocked `product`/`collection` objects (Shopify can't be reached from the sandbox), map `asset_url` to the local files, then screenshot with Playwright.
 - `css/styles.css` uses design tokens in `:root` (ink/mist/sand palette, `--sun-*` accents, `--radius`, `--nav-h`). Breakpoints are 833px and 560px. `prefers-reduced-motion` disables the animations.

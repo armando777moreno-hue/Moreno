@@ -1,5 +1,5 @@
 /* MORENO.co — Neomorfismo. Estilos propios del tema (prefijo mn-). */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* Las fuentes (Manrope, Cormorant Garamond, DM Mono) se cargan desde layout/theme.liquid. */
 
 :root {
   --mn-fondo: #E9E4DC;          /* arena: el "material" del que sale todo */
@@ -7,8 +7,11 @@
   --mn-sombra: rgba(170, 158, 140, .55);
   --mn-sombra-fuerte: rgba(150, 137, 118, .7);
   --mn-tinta: #3A332C;
-  --mn-tinta-suave: #8A8074;
-  --mn-acento: #D9774E;         /* atardecer de La Perla: solo puntos de luz y estados */
+  --mn-tinta-suave: #675E53;     /* 5.0:1 sobre la arena */
+  --mn-acento: #D9774E;         /* atardecer de La Perla: solo puntos de luz, aros y filetes */
+  --mn-acento-texto: #9E4A26;   /* el mismo tono, oscurecido para texto y botones: 4.8:1 sobre arena, 6.1:1 con blanco */
+  --mn-cristal: rgb(233 228 220 / .82);
+  --mn-toque: 44px;             /* área mínima de toque */
   --mn-display: 'Manrope', -apple-system, 'Helvetica Neue', Arial, sans-serif;
   --mn-marca: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --mn-cuerpo: 'Manrope', -apple-system, 'Helvetica Neue', Arial, sans-serif;
@@ -55,14 +58,15 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   font: 700 15px/1 var(--mn-cuerpo); letter-spacing: .02em;
   box-shadow: 8px 8px 18px var(--mn-sombra), -8px -8px 18px var(--mn-luz);
   transition: box-shadow .35s var(--mn-ease), transform .35s var(--mn-ease), color .3s; }
-.mn-btn:hover { transform: translateY(-1px); color: var(--mn-acento) !important; }
+.mn-btn:hover { transform: translateY(-2px); box-shadow: 10px 10px 22px var(--mn-sombra-fuerte), -9px -9px 20px var(--mn-luz); }
 .mn-btn:active, .mn-btn[aria-pressed="true"] { transform: none;
   box-shadow: inset 6px 6px 12px var(--mn-sombra), inset -6px -6px 12px var(--mn-luz); }
-.mn-btn--acento { color: #fff !important; background: var(--mn-acento);
+.mn-btn--acento { color: #fff !important; background: var(--mn-acento-texto);
   box-shadow: 8px 8px 18px var(--mn-sombra), -8px -8px 18px var(--mn-luz), inset 0 1px 0 rgba(255,255,255,.35); }
 .mn-btn--acento:hover { color: #fff !important; filter: brightness(1.04); }
 .mn-btn:disabled { opacity: .5; cursor: not-allowed; }
-.mn-btn:focus-visible, .mn-chip:focus-within { outline: 2px solid var(--mn-acento); outline-offset: 4px; }
+.mn-btn:focus-visible, .mn-chip:has(input:focus-visible), .mn-dial__punto:focus-visible, .mn-punto:focus-visible,
+.mn-pdp__visor-ui button:focus-visible, .mn-acordeon summary:focus-visible { outline: 2px solid var(--mn-acento-texto); outline-offset: 4px; }
 
 /* ---------- Reveals y 3D al hacer scroll ---------- */
 .mn-reveal { opacity: 0; transform: translateY(32px); transition: opacity .9s var(--mn-ease), transform .9s var(--mn-ease); }
@@ -73,7 +77,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 /* Elementos que se inclinan en 3D según su posición en pantalla (--mn-p de -1 a 1, lo pone el JS) */
 .mn-escena { perspective: 1400px; }
 [data-mn-3d] { transform: rotateX(calc(var(--mn-p, 0) * var(--mn-3d-x, 14deg))) rotateY(calc(var(--mn-p, 0) * var(--mn-3d-y, 0deg)))
-  translateZ(calc((1 - var(--mn-pa, 0)) * 0px)); transform-style: preserve-3d; will-change: transform; }
+  translateZ(calc((1 - var(--mn-pa, 0)) * 0px)); transform-style: preserve-3d; }
 
 /* ---------- Héroe 3D ---------- */
 .mn-hero { position: relative; min-height: min(100svh, 980px); display: grid; align-items: center; }
@@ -82,7 +86,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   transform: perspective(1400px) rotateY(calc(var(--mn-hero, 0) * 18deg)) translateZ(calc(var(--mn-hero, 0) * -120px));
   opacity: calc(1 - var(--mn-hero, 0) * .6); }
 .mn-section h1.mn-hero__title { font-size: clamp(52px, 8.4vw, 132px); margin: 18px 0 .12em; }
-.mn-hero__title em { display: block; font-family: var(--mn-marca); font-style: italic; font-weight: 500; letter-spacing: -.01em; color: var(--mn-acento); }
+.mn-hero__title em { display: block; font-family: var(--mn-marca); font-style: italic; font-weight: 500; letter-spacing: -.01em; color: var(--mn-acento-texto); }
 .mn-hero__sub { max-width: 34ch; }
 .mn-hero__ctas { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 34px; }
 .mn-hero__stage { position: relative; aspect-ratio: 1 / 1; width: 100%; }
@@ -127,6 +131,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   transition: box-shadow .3s, scale .3s var(--mn-ease); }
 .mn-dial__punto:hover { scale: 1.12; }
 .mn-dial__punto[aria-checked="true"] { scale: 1.18; box-shadow: inset 3px 3px 7px rgba(0,0,0,.25), inset -3px -3px 7px rgba(255,255,255,.35), 0 0 0 4px var(--mn-fondo), 0 0 0 6px var(--mn-acento); }
+.mn-dial__aro { touch-action: none; } /* arrastrar el aro gira la rueda; el centro deja desplazar la página */
 .mn-dial__centro { position: absolute; inset: 20%; border-radius: 50%; display: grid; place-items: center; perspective: 900px; }
 .mn-dial__prenda { width: 82%; height: 82%; object-fit: contain; transition: transform .7s var(--mn-ease), opacity .35s; }
 .mn-dial__prenda.is-girando { transform: rotateY(90deg) scale(.92); opacity: .2; }
@@ -191,7 +196,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-frase__texto { font-size: clamp(30px, 4.6vw, 68px); font-weight: 800; letter-spacing: -.03em; line-height: 1.12; }
 .mn-frase__texto .mn-w { color: var(--mn-tinta); opacity: .16; transition: opacity .35s linear, color .35s; }
 .mn-frase__texto .mn-w.is-on { opacity: 1; }
-.mn-frase__texto .mn-w.is-acento.is-on { color: var(--mn-acento); }
+.mn-frase__texto .mn-w.is-acento.is-on { color: var(--mn-acento-texto); }
 .mn-frase__caja { padding: clamp(32px, 6vw, 88px); }
 
 /* ---------- Detalles con puntos ---------- */
@@ -208,18 +213,18 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-detalle__item h3 { font: 800 20px/1.2 var(--mn-display); letter-spacing: -.02em; margin-bottom: 6px; }
 .mn-detalle__item p { color: var(--mn-tinta-suave); line-height: 1.5; }
 .mn-detalle__item.is-on { box-shadow: inset 6px 6px 14px var(--mn-sombra), inset -6px -6px 14px var(--mn-luz); }
-.mn-detalle__item.is-on h3 { color: var(--mn-acento); }
+.mn-detalle__item.is-on h3 { color: var(--mn-acento-texto); }
 @media (max-width: 989px) { .mn-detalle__grid { grid-template-columns: 1fr; } }
 
 /* ---------- Panorámica con profundidad ---------- */
 .mn-pano { position: relative; perspective: 1200px; }
 .mn-pano__ventana { position: relative; height: clamp(460px, 78vh, 820px); border-radius: var(--mn-radio); overflow: hidden; }
-.mn-pano__capa { position: absolute; inset: -18% 0; will-change: transform; }
+.mn-pano__capa { position: absolute; inset: -18% 0; }
 .mn-pano__capa img { width: 100%; height: 100%; object-fit: cover; }
 .mn-pano__velo { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20, 16, 12, var(--mn-velo, .45)), transparent 65%); }
 .mn-pano__card { position: absolute; left: clamp(16px, 4vw, 56px); bottom: clamp(16px, 4vw, 56px); max-width: 520px; padding: clamp(24px, 3vw, 40px);
-  transform: translateZ(calc(var(--mn-p, 0) * 80px)) rotateX(calc(var(--mn-p, 0) * -8deg)); will-change: transform;
-  background: rgba(233, 228, 220, .82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  transform: translateZ(calc(var(--mn-p, 0) * 80px)) rotateX(calc(var(--mn-p, 0) * -8deg));
+  background: var(--mn-cristal); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .mn-pano__card h2 { font-size: clamp(30px, 4vw, 56px); margin: 10px 0 12px; }
 
 /* ---------- Cierre con logo gigante ---------- */
@@ -235,7 +240,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-pdp__visor { position: relative; aspect-ratio: 1 / 1; }
 .mn-pdp__visor .mn-360 { position: absolute; inset: 0; }
 .mn-pdp__visor-ui { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px; border-radius: 999px; }
-.mn-pdp__visor-ui button { border: 0; background: transparent; padding: 9px 14px; border-radius: 999px; font: 600 13px/1 var(--mn-cuerpo); color: var(--mn-tinta-suave); cursor: pointer; }
+.mn-pdp__visor-ui button { border: 0; background: transparent; min-height: var(--mn-toque); padding: 0 16px; border-radius: 999px; font: 600 13px/1 var(--mn-cuerpo); color: var(--mn-tinta-suave); cursor: pointer; }
 .mn-pdp__visor-ui button[aria-selected="true"] { color: var(--mn-tinta); box-shadow: inset 3px 3px 7px var(--mn-sombra), inset -3px -3px 7px var(--mn-luz); }
 .mn-pdp__fotos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
 .mn-pdp__foto { aspect-ratio: 1 / 1; overflow: hidden; padding: 10px; }
@@ -249,10 +254,10 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-opcion legend { width: 100%; display: flex; justify-content: space-between; margin-bottom: 12px; padding: 0; }
 .mn-chip { position: relative; }
 .mn-chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
-.mn-chip span { display: inline-flex; align-items: center; gap: 8px; min-width: 52px; justify-content: center; padding: 12px 16px; border-radius: 16px;
+.mn-chip span { display: inline-flex; align-items: center; gap: 8px; min-width: 52px; min-height: var(--mn-toque); justify-content: center; padding: 10px 16px; border-radius: 16px;
   font: 600 14px/1 var(--mn-cuerpo); box-shadow: 5px 5px 12px var(--mn-sombra), -5px -5px 12px var(--mn-luz); transition: box-shadow .3s, color .3s; }
 .mn-chip span i { width: 14px; height: 14px; border-radius: 50%; background: var(--sw, #bbb); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
-.mn-chip input:checked + span { color: var(--mn-acento); box-shadow: inset 4px 4px 9px var(--mn-sombra), inset -4px -4px 9px var(--mn-luz); }
+.mn-chip input:checked + span { color: var(--mn-acento-texto); box-shadow: inset 4px 4px 9px var(--mn-sombra), inset -4px -4px 9px var(--mn-luz); }
 .mn-chip.is-agotada span { text-decoration: line-through; opacity: .45; }
 .mn-link { background: none; border: 0; padding: 0; font: 500 12px/1 var(--mn-mono); letter-spacing: .08em; text-decoration: underline; cursor: pointer; color: var(--mn-tinta); }
 .mn-acordeon { border-radius: 22px; }
@@ -285,6 +290,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-footer { display: grid; gap: 36px; }
 .mn-footer__marca { font-size: clamp(40px, 6vw, 88px); line-height: .9; color: var(--mn-fondo);
   text-shadow: 5px 5px 10px var(--mn-sombra-fuerte), -5px -5px 10px var(--mn-luz); }
+.mn-footer__fila a { display: inline-flex; align-items: center; min-height: var(--mn-toque); }
 .mn-footer__fila { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: center; }
 .mn-footer__links { display: flex; flex-wrap: wrap; gap: 12px; }
 .mn-footer__links a { padding: 12px 18px; border-radius: 999px; font: 600 14px/1 var(--mn-cuerpo); }
@@ -295,3 +301,12 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   [data-mn-3d], .mn-hero__card, .mn-cierre__logo span, .mn-pano__card { transform: none !important; }
   .mn-punto::before { animation: none; }
 }
+
+/* ---------- Área de toque, superficies del navegador y utilidades ---------- */
+.mn-punto::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; } /* 38px visibles, 46px de toque */
+@media (hover: none) { .mn-card__img--hover { display: none; } } /* sin ratón no hay hover: ni se pinta ni se descarga */
+.mn-acordeon summary h2 { margin: 0; font: inherit; }
+.mn-acordeon__cuerpo h3 { font: 700 14px/1.3 var(--mn-cuerpo); letter-spacing: .02em; margin: 18px 0 8px; color: var(--mn-tinta); }
+.mn-sr { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+::selection { background: color-mix(in srgb, var(--mn-acento) 32%, var(--mn-fondo)); color: var(--mn-tinta); }
+.mn-section input, .mn-section textarea { caret-color: var(--mn-acento-texto); }

@@ -15,6 +15,7 @@ Es un duplicado de Horizon: se reemplazaron el inicio, la página de producto, l
 | `assets/mn-viewer.min.js` | El visor 3D de la camiseta (three r128), con el modo `data-scroll`: gira al deslizar. |
 | `assets/moreno-lienzo-*.webp` / `-h.png` | Texturas y mapas de relieve de los 11 colores de Lienzo. |
 | `assets/mn-la-perla.jpg` | Foto de La Perla para la panorámica. |
+| `layout/theme.liquid` | El layout de Horizon con 4 líneas añadidas en `<head>`: preconexión y hoja de Google Fonts, y `mn-styles.css` cargado una sola vez. |
 | `snippets/mn-tarjeta.liquid` | Tarjeta de producto en relieve. Si el producto no tiene foto, muestra el refrán en cursiva. |
 | `sections/mn-hero.liquid` | Apertura: la tarjeta se inclina al hacer scroll y la camiseta 3D gira con el scroll. |
 | `sections/mn-marquesina.liquid` | Banda hundida con frases en movimiento. |
@@ -42,3 +43,11 @@ Es un duplicado de Horizon: se reemplazaron el inicio, la página de producto, l
 4. **Guía de tallas**: el campo está vacío porque no tenemos medidas reales. Se llena en la sección de producto, una fila por línea: `Talla | Pecho | Largo`.
 5. **Fotos de las camisetas del Drop 001**: no tienen foto, así que se muestran como tarjetas tipográficas con su refrán. Al subirles fotos, aparecerán solas.
 6. Las descripciones de los productos están en inglés en Shopify. El resto del tema está en español.
+
+## Auditoría Impeccable (accesibilidad y rendimiento)
+
+- Texto secundario `--mn-tinta-suave` #675E53 (5.0:1). El acento se divide en `--mn-acento` (#D9774E, solo decoración) y `--mn-acento-texto` (#9E4A26, para botones y texto: 6.1:1 con blanco).
+- Controles de al menos 44px (`--mn-toque`). La rueda de color usa una sola parada de tabulador más las flechas, Inicio y Fin; solo el aro se arrastra (`touch-action: none`), y el arrastre se limpia en `pointercancel`.
+- Títulos sin saltos: los acordeones usan `h2` y la descripción pasa de `h4` a `h3`; la colección lleva un `h2` oculto.
+- Las fuentes y los estilos se cargan desde el layout, no desde cada sección. `will-change` se quitó de los estilos en reposo. La segunda foto de las tarjetas no se pinta en pantallas táctiles.
+- Las plantillas de la tienda (por ejemplo `templates/index.json`) pueden tener ajustes guardados desde el editor. No se suben desde aquí, para no pisarlos.

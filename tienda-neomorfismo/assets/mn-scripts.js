@@ -132,7 +132,8 @@
         if (i === actual) return;
         actual = i;
         var p = puntos[i];
-        puntos.forEach(function (b, j) { b.setAttribute('aria-checked', String(j === i)); });
+        // un solo punto enfocable (el elegido): el tabulador entra y sale de la rueda en una parada
+        puntos.forEach(function (b, j) { b.setAttribute('aria-checked', String(j === i)); b.tabIndex = j === i ? 0 : -1; });
         aro.style.transform = 'rotate(' + (-i * 360 / n) + 'deg)';
         nombre.textContent = p.dataset.nombre;
         if (precio && p.dataset.precio) precio.textContent = p.dataset.precio;
@@ -150,10 +151,12 @@
       });
       // Arrastrar en círculo sobre la rueda cambia de color
       var arrastre = null;
-      dial.addEventListener('pointerdown', function (e) {
+      // Solo el aro se arrastra (touch-action: none en CSS); el centro deja desplazar la página en táctil.
+      aro.addEventListener('pointerdown', function (e) {
         if (e.target.closest('.mn-dial__punto')) return;
         var r = dial.getBoundingClientRect();
         arrastre = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, a0: Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)), i0: actual };
+        try { aro.setPointerCapture(e.pointerId); } catch (err) {}
       });
       window.addEventListener('pointermove', function (e) {
         if (!arrastre) return;
@@ -161,10 +164,18 @@
         var d = a - arrastre.a0;
         elegir(arrastre.i0 - Math.round(d / (Math.PI * 2 / n)));
       });
-      window.addEventListener('pointerup', function () { arrastre = null; });
+      function soltar() { arrastre = null; }
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { aro.addEventListener(ev, soltar); });
+      window.addEventListener('pointerup', soltar);
+      window.addEventListener('blur', soltar);
       dial.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { elegir(actual + 1); e.preventDefault(); }
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { elegir(actual - 1); e.preventDefault(); }
+        var d = 0;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') d = 1;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') d = -1;
+        if (e.key === 'Home') d = -actual;
+        if (e.key === 'End') d = n - 1 - actual;
+        if (!d) return;
+        e.preventDefault(); elegir(actual + d); puntos[actual].focus();
       });
       elegir(parseInt(dial.dataset.inicio || '0', 10) || 0);
     });
