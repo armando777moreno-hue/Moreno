@@ -2,3 +2,4 @@ pillow
 numpy
 scipy
 opencv-python-headless
+scikit-image

@@ -12,6 +12,11 @@
  * API: el elemento recibe root.morenoSetColor(c) y emite el evento 'moreno:color'.
  * Con data-scroll="<vueltas>" la prenda gira según el avance del scroll por su sección
  * (arrastrar sigue funcionando y desplaza el punto de partida).
+ *
+ * Modo modelo (peluche): data-model="…/modelo.json" con data-atlas="…/atlas.webp" y
+ * data-mesh="…/modelo.bin" (los genera tools/build_peluche.py). Es una malla cerrada
+ * sobre la que se proyectan las fotos reales de cada vista; se apoya en un suelo que
+ * recibe su sombra. data-front / data-back son las fotos del respaldo sin WebGL.
  */
 (function () {
   'use strict';
@@ -65,19 +70,35 @@
     markColor(color);
 
     if (!window.THREE || !hasWebGL()) return fallback();
+    if (root.dataset.model) {
+      Promise.all([
+        fetch(root.dataset.model).then(function (r) { if (!r.ok) throw r; return r.json(); }),
+        fetch(root.dataset.mesh).then(function (r) { if (!r.ok) throw r; return r.arrayBuffer(); }),
+        loadImage(root.dataset.atlas)
+      ]).then(function (res) { initModel(res[0], res[1], res[2]); }).catch(fallback);
+      return;
+    }
     Promise.all([loadImage(url(root.dataset.tex, color)), loadImage(url(root.dataset.height, color))])
       .then(function (imgs) { init(imgs[0], imgs[1]); })
       .catch(fallback);
 
-    function init(texImg, heightImg) {
+    function stageSetup(opts) {
       var THREE = window.THREE;
       var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.setClearColor(0x000000, 0);
-
+      if (opts.shadow) {
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      }
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+      return { THREE: THREE, renderer: renderer, scene: scene, camera: camera };
+    }
+
+    function init(texImg, heightImg) {
+      var st = stageSetup({}), THREE = st.THREE, renderer = st.renderer, scene = st.scene, camera = st.camera;
       camera.position.set(0, 0.02, 5.3);
       scene.add(new THREE.HemisphereLight(0xffffff, 0xb9ab98, 0.75));
       var key = new THREE.DirectionalLight(0xfff4e6, 0.7);
@@ -155,6 +176,114 @@
           .then(function () { if (ticket === loading) root.classList.remove('is-loading'); });
       };
 
+      animate(st, function (angle, tilt, now) {
+        shirt.rotation.y = angle;
+        shirt.rotation.x = tilt;
+        shirt.position.y = reduceMotion ? 0 : Math.sin(now / 1000) * 0.02;
+      });
+    }
+
+    // Peluche: malla del volumen + fotos proyectadas por vista, sobre un suelo con sombra.
+    function initModel(meta, buf, atlasImg) {
+      var st = stageSetup({ shadow: true }), THREE = st.THREE, renderer = st.renderer, scene = st.scene, camera = st.camera;
+      var HEIGHT = 1.6;                                   // alto del peluche en la escena
+      camera.position.set(0, 0.95, 4.7);
+      camera.lookAt(0, 0.72, 0);
+
+      // Malla: posiciones Uint16 normalizadas a la caja, 5 pesos Uint8 por vértice, índices Uint16.
+      var n = meta.vertices, lo = meta.min, hi = meta.max;
+      var q = new Uint16Array(buf, 0, n * 3), w = new Uint8Array(buf, n * 6, n * 5);
+      var idxOff = n * 6 + n * 5 + ((n * 5) % 2);
+      var idx = new Uint16Array(buf, idxOff, meta.indices);
+      var pos = new Float32Array(n * 3), w4 = new Uint8Array(n * 4), w1 = new Uint8Array(n);
+      for (var i = 0; i < n; i++) {
+        for (var k = 0; k < 3; k++) pos[i * 3 + k] = lo[k] + q[i * 3 + k] / 65535 * (hi[k] - lo[k]);
+        for (k = 0; k < 4; k++) w4[i * 4 + k] = w[i * 5 + k];
+        w1[i] = w[i * 5 + 4];
+      }
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('pesos', new THREE.BufferAttribute(w4, 4, true));
+      geo.setAttribute('pesoArriba', new THREE.BufferAttribute(w1, 1, true));
+      geo.setIndex(new THREE.BufferAttribute(idx, 1));
+      geo.computeVertexNormals();
+
+      var tex = new THREE.Texture(atlasImg);
+      tex.flipY = false;                                  // la proyección cuenta filas desde arriba
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      tex.needsUpdate = true;
+      var P = meta.proyeccion, order = meta.vistas, U = [], V = [];
+      order.forEach(function (name) {
+        U.push(new THREE.Vector4().fromArray(P[name][0]));
+        V.push(new THREE.Vector4().fromArray(P[name][1]));
+      });
+      var mat = new THREE.ShaderMaterial({
+        uniforms: { atlas: { value: tex }, U: { value: U }, V: { value: V }, luz: { value: new THREE.Vector3(-0.45, 0.6, 0.66).normalize() } },
+        vertexShader: [
+          'attribute vec4 pesos; attribute float pesoArriba;',
+          'varying vec4 vW; varying float vTop; varying vec3 vP; varying vec3 vN;',
+          'void main() {',
+          '  vW = pesos; vTop = pesoArriba; vP = position;',
+          '  vN = normalize(mat3(modelMatrix) * normal);',
+          '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+          '}'
+        ].join('\n'),
+        fragmentShader: [
+          'uniform sampler2D atlas; uniform vec4 U[5]; uniform vec4 V[5]; uniform vec3 luz;',
+          'varying vec4 vW; varying float vTop; varying vec3 vP; varying vec3 vN;',
+          'vec3 vista(int i) { vec4 p = vec4(vP, 1.0); return texture2D(atlas, vec2(dot(U[i], p), dot(V[i], p))).rgb; }',
+          'void main() {',
+          '  float s = vW.x + vW.y + vW.z + vW.w + vTop;',
+          '  vec3 c = (vista(0) * vW.x + vista(1) * vW.y + vista(2) * vW.z + vista(3) * vW.w + vista(4) * vTop) / max(s, 1e-3);',
+          // Las fotos ya traen su luz de estudio: aquí solo se suma un poco de volumen.
+          '  vec3 n = normalize(vN);',
+          '  float l = 0.86 + 0.2 * max(dot(n, luz), 0.0) - 0.08 * max(-n.y, 0.0);',
+          '  gl_FragColor = vec4(c * l, 1.0);',
+          '}'
+        ].join('\n')
+      });
+      var mesh = new THREE.Mesh(geo, mat);
+      var scale = HEIGHT / meta.altura;
+      mesh.scale.setScalar(scale);
+      mesh.position.set(-meta.centro[0] * scale, -meta.base * scale, -meta.centro[1] * scale);
+      mesh.castShadow = true;
+      var plush = new THREE.Group();
+      plush.add(mesh);
+
+      // Suelo: solo se ve la sombra (la proyectada y una de contacto, difusa, justo debajo).
+      var floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.ShadowMaterial({ opacity: 0.2 }));
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      var blob = document.createElement('canvas');
+      blob.width = blob.height = 128;
+      var g = blob.getContext('2d'), grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grad.addColorStop(0, 'rgba(40,30,20,0.55)'); grad.addColorStop(0.55, 'rgba(40,30,20,0.18)'); grad.addColorStop(1, 'rgba(40,30,20,0)');
+      g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+      var contact = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.15), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(blob), transparent: true, depthWrite: false }));
+      contact.rotation.x = -Math.PI / 2;
+      contact.position.y = 0.002;
+
+      var sun = new THREE.DirectionalLight(0xffffff, 1);
+      sun.position.set(-1.6, 3.4, 1.8);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.radius = 6;
+      sun.shadow.bias = -0.002;
+      var sc = sun.shadow.camera;
+      sc.left = -1.6; sc.right = 1.6; sc.top = 1.6; sc.bottom = -1.6; sc.near = 0.5; sc.far = 8;
+
+      var world = new THREE.Group();                      // inclinar = mover la cámara alrededor
+      world.add(plush, floor, contact, sun, sun.target);
+      scene.add(world);
+
+      animate(st, function (angle, tilt) {
+        plush.rotation.y = angle;
+        world.rotation.x = tilt * 0.6;
+      });
+    }
+
+    function animate(st, pose) {
+      var renderer = st.renderer, scene = st.scene, camera = st.camera;
       // ---- Interacción ----
       var angle = VIEWS.front, target = null, velocity = 0, tilt = 0, tiltTarget = 0;
       var dragging = false, decided = false, lastX = 0, lastY = 0, startX = 0, startY = 0, lastT = 0;
@@ -251,9 +380,7 @@
           }
         }
         tilt += (tiltTarget - tilt) * Math.min(1, dt * 8);
-        shirt.rotation.y = angle;
-        shirt.rotation.x = tilt;
-        shirt.position.y = reduceMotion ? 0 : Math.sin(now / 1000) * 0.02;
+        pose(angle, tilt, now);
         renderer.render(scene, camera);
       }
       requestAnimationFrame(frame);
@@ -266,8 +393,12 @@
       var fb = root.querySelector('[data-fallback]'), flip = root.querySelector('[data-flip]');
       var faces = flip.querySelectorAll('img');
       fb.hidden = false;
-      applyColor = function (c) { faces.forEach(function (img) { img.src = url(root.dataset.tex, c); }); };
-      applyColor(color);
+      if (root.dataset.model) { // peluche: foto de frente y de espalda
+        faces[0].src = root.dataset.front; faces[1].src = root.dataset.back || root.dataset.front;
+      } else {
+        applyColor = function (c) { faces.forEach(function (img) { img.src = url(root.dataset.tex, c); }); };
+        applyColor(color);
+      }
       var deg = 0;
       function turn(d) { deg = d; flip.style.transform = 'rotateY(' + deg + 'deg)'; }
       tabs.forEach(function (b) {
@@ -282,7 +413,16 @@
     }
   }
 
-  function boot() { document.querySelectorAll('[data-moreno-360]').forEach(mount); }
+  // Con data-lazy el visor se monta (y descarga su modelo) solo cuando aparece en pantalla;
+  // si está oculto con [hidden], espera a que se muestre.
+  function boot() {
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); mount(e.target); } });
+    }, { rootMargin: '200px' }) : null;
+    document.querySelectorAll('[data-moreno-360]').forEach(function (el) {
+      if (io && el.hasAttribute('data-lazy')) io.observe(el); else mount(el);
+    });
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   document.addEventListener('shopify:section:load', boot); // editor de temas
 })();

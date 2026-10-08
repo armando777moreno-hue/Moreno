@@ -2,6 +2,8 @@
   MORENO.co — visor 360° de Lienzo con sus colores reales (estilo apple.com).
   Texturas: assets/moreno-lienzo-<color>.webp y -h.png. Lógica: assets/moreno-viewer.min.js
   (generado desde js/viewer.js del repositorio).
+  Opcional: el peluche 3D en una segunda pestaña (assets/moreno-peluche-*, generados por
+  tools/build_peluche.py). Se descarga solo cuando el cliente abre esa pestaña.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
 {%- assign colors = s.colors | split: ',' -%}
@@ -35,7 +37,14 @@
     {%- if s.text != blank -%}<p class="m360__lead">{{ s.text | escape }}</p>{%- endif -%}
   </div>
 
-  <div class="m360__viewer" data-moreno-360 data-tex="{{ tex }}" data-height="{{ hmap }}" data-color="{{ start }}">
+  {%- if s.mostrar_peluche -%}
+    <div class="m360__segmented m360__switch" role="tablist" aria-label="Pieza">
+      <button type="button" role="tab" id="m360-tab-a-{{ section.id }}" aria-controls="m360-a-{{ section.id }}" aria-selected="true">{{ s.nombre_camiseta | escape }}</button>
+      <button type="button" role="tab" id="m360-tab-b-{{ section.id }}" aria-controls="m360-b-{{ section.id }}" aria-selected="false">{{ s.nombre_peluche | escape }}</button>
+    </div>
+  {%- endif -%}
+
+  <div class="m360__viewer" id="m360-a-{{ section.id }}" {% if s.mostrar_peluche %}role="tabpanel" aria-labelledby="m360-tab-a-{{ section.id }}"{% endif %} data-moreno-360 data-tex="{{ tex }}" data-height="{{ hmap }}" data-color="{{ start }}">
     <div class="m360__stage" data-stage>
       <canvas aria-label="Visor 3D de la camiseta. Arrastra para girar." role="img"></canvas>
       <div class="m360__fallback" data-fallback hidden>
@@ -65,9 +74,54 @@
       </button>
     </div>
   </div>
+
+  {%- if s.mostrar_peluche -%}
+    <div class="m360__viewer" id="m360-b-{{ section.id }}" role="tabpanel" aria-labelledby="m360-tab-b-{{ section.id }}" hidden
+      data-moreno-360 data-lazy
+      data-model="{{ 'moreno-peluche-modelo.json' | asset_url }}" data-mesh="{{ 'moreno-peluche-modelo.bin' | asset_url }}"
+      data-atlas="{{ 'moreno-peluche-atlas.webp' | asset_url }}"
+      data-front="{{ 'moreno-peluche-frente.webp' | asset_url }}" data-back="{{ 'moreno-peluche-espalda.webp' | asset_url }}">
+      <div class="m360__stage" data-stage>
+        <canvas aria-label="Visor 3D del peluche. Arrastra para girar." role="img"></canvas>
+        <div class="m360__fallback" data-fallback hidden>
+          <div class="m360__flip" data-flip>
+            <img class="m360__face" alt="Peluche de frente" loading="lazy">
+            <img class="m360__face m360__face--back" alt="Peluche de espalda" loading="lazy">
+          </div>
+        </div>
+        <div class="m360__hint" data-hint>
+          <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Arrastra para girar
+        </div>
+      </div>
+      {%- if s.medidas_peluche != blank -%}<p class="m360__note">{{ s.medidas_peluche | escape }}</p>{%- endif -%}
+      <div class="m360__segmented" role="tablist" aria-label="Vista">
+        <button type="button" role="tab" data-view="front" aria-selected="true">Frente</button>
+        <button type="button" role="tab" data-view="side">Perfil</button>
+        <button type="button" role="tab" data-view="back">Espalda</button>
+        <button type="button" role="tab" data-view="spin" class="m360__spin" aria-label="Girar automáticamente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
 </section>
 
 <script>
+  // Pestañas Camiseta / Peluche: muestran un visor y ocultan el otro.
+  (function () {
+    if (window.__moreno360Switch) return;
+    window.__moreno360Switch = true;
+    document.addEventListener('click', function (e) {
+      var tab = e.target.closest && e.target.closest('.m360__switch [role="tab"]');
+      if (!tab) return;
+      tab.parentNode.querySelectorAll('[role="tab"]').forEach(function (t) {
+        var on = t === tab, panel = document.getElementById(t.getAttribute('aria-controls'));
+        t.setAttribute('aria-selected', String(on));
+        if (panel) panel.hidden = !on;
+      });
+    });
+  })();
   // Si el cliente elige un color en el selector de variantes del producto, el visor lo sigue.
   (function () {
     if (window.__moreno360Sync) return;
@@ -119,6 +173,9 @@
   .m360__segmented button { border: 0; background: transparent; padding: 8px 18px; border-radius: 980px; font: inherit; font-size: 14px; font-weight: 500; color: var(--m360-muted); cursor: pointer; transition: background .25s, color .25s, box-shadow .25s; }
   .m360__segmented button[aria-selected='true'] { background: #fff; color: var(--m360-ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .1); }
   .m360__spin { display: grid; place-items: center; padding: 8px 12px !important; }
+  .m360__switch { margin-top: 32px; }
+  .m360__viewer[hidden] { display: none; }
+  .m360__note { margin: 20px 0 0; font-size: 15px; font-weight: 600; color: var(--m360-ink); }
   .m360__spin svg { width: 18px; height: 18px; }
   @media (max-width: 560px) { .m360__segmented button { padding: 8px 14px; } }
   @media (prefers-reduced-motion: reduce) { .m360__flip, .m360__hint { transition: none; } }
@@ -130,8 +187,13 @@
   "settings": [
     { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "360°" },
     { "type": "text", "id": "heading", "label": "Título", "default": "Gírala. Elige tu color." },
-    { "type": "text", "id": "text", "label": "Texto", "default": "Arrastra para rotar la camiseta y toca un color para verla con su foto real." },
+    { "type": "text", "id": "text", "label": "Texto", "default": "Arrastra para girar cada pieza. En la camiseta, toca un color para verla con su foto real." },
     { "type": "textarea", "id": "colors", "label": "Colores", "info": "clave:Nombre:#hex separados por comas. Cada clave necesita assets/moreno-lienzo-<clave>.webp y -h.png.", "default": "onyx:Onyx:#323338, ink:Ink:#111015, bone:Bone:#dfe1f2, stone:Stone:#7b7b7d, ash:Ash:#95969a, sand:Sand:#dbd0c3, espresso:Espresso:#937663, oxblood:Oxblood:#d51625, midnight:Midnight:#171b30, dusty-rose:Dusty Rose:#f689b4, rose:Rosé:#dc84a6" },
+    { "type": "header", "content": "Peluche 3D" },
+    { "type": "checkbox", "id": "mostrar_peluche", "label": "Mostrar el peluche en una segunda pestaña", "default": true },
+    { "type": "text", "id": "nombre_camiseta", "label": "Nombre de la pestaña de la camiseta", "default": "Camiseta Lienzo" },
+    { "type": "text", "id": "nombre_peluche", "label": "Nombre de la pestaña del peluche", "default": "Peluche" },
+    { "type": "text", "id": "medidas_peluche", "label": "Medidas del peluche", "default": "36 cm sentado · 42 cm de pie" },
     { "type": "header", "content": "Colores" },
     { "type": "color", "id": "color_bg", "label": "Fondo", "default": "#F5F5F7" },
     { "type": "color", "id": "color_ink", "label": "Texto", "default": "#1D1D1F" },

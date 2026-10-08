@@ -42,13 +42,21 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
   - The back is the same photo, horizontally mirrored, on a plane rotated π. The mirroring is done via texture `repeat.x = -1`, plus the height map sampled at `1-u`, so both silhouettes coincide.
   - Switching color reloads the texture and the height map, and re-displaces both geometries.
   - Without WebGL, it falls back to a CSS flip card.
+  - **Model mode** (the plush): `data-model` (meta JSON), `data-mesh` (binary) and `data-atlas` load a closed mesh that is textured in a ShaderMaterial by projecting the 5 real photos (per-view orthographic projection from the meta, per-vertex blend weights). It stands on a floor with a real shadow map (`ShadowMaterial`) plus a soft contact shadow; vertical drag tilts the whole world group. `data-front`/`data-back` feed the no-WebGL flip card. `data-lazy` defers mounting until the element is on screen (a `[hidden]` panel never mounts until shown).
+  - `init()` (shirt) and `initModel()` (plush) share `stageSetup()` and the interaction/render loop `animate(st, pose)`.
 - `tools/build_lienzo.py` turns the supplier photos (`assets/originals/lienzo/<color>.jpg`, front view on white) into `assets/img/lienzo/<color>.webp` (1024² RGBA cutout via flood-fill from the white border), `<color>-h.png` (256² height map) and `colors.json` (mean color of each photo). It also writes the bento detail crops.
   - The photos came from the Shopify product media. Because the sandbox can't reach the CDN, they were downloaded by upserting `cdn.shopify.com/...&width=1000` URLs into the unpublished theme and reading the files back as base64.
   - The supplier photos don't always match the color names (e.g. "Oxblood" is bright red, "Bone" is white). The site shows the real photos.
+- `tools/build_peluche.py` builds the plush from `assets/originals/peluche/vistas.jpg` (supplier turnaround sheet: front, right, back, left, top on white) into `assets/img/peluche/` (`atlas.webp`, `modelo.bin`, `modelo.json`, `frente.webp`, `espalda.webp`).
+  - Volume: per height row, the front photo gives x-intervals and the right-side photo z-intervals; each paired interval becomes a superellipse (`pairs()` avoids "fins": a piece with no similar partner becomes round). Gaussian-smoothed, marching cubes at step 2 (keep < 65 536 vertices for Uint16 indices).
+  - The photos don't share a pose (front is sitting, sides/back standing), so each view only paints vertices inside its own silhouette, facing it (`SHARP`) and not occluded (voxel ray march). The side photos are warped row-wise so their eye lands where the front eye sits on the volume (no "third eye" at 3/4 views); the top photo is aligned by the horns.
+  - Binary layout: Uint16 positions (normalized to the bbox) + 5 Uint8 weights per vertex (+1 pad byte if odd) + Uint16 indices. The Shopify copies are `shopify/assets/moreno-peluche-*`.
+  - The 360° section (`index.html` `#viewer`, Shopify `moreno-360`) has a "Camiseta Lienzo / Peluche" tab switch; the plush panel is `hidden` + `data-lazy`. The plush is not a Shopify product (no supplier/price yet).
 - **Unused Atardecer assets**: "Atardecer — Oversized Art Tee" was a mockup-based product that is no longer sold; it was deleted from Shopify along with its uploaded files.
   - `tools/build_assets.py` still generates its images (`shirt-*.webp`, campaign crops) plus the La Perla photos that the site does use.
   - Don't reintroduce the Atardecer images as a sellable product.
 - `shopify/` holds the Shopify theme files, kept in sync by hand with the store. They live in the **unpublished** theme "MORENO CO. — Arte 360° (borrador)", a duplicate of the live Horizon-based theme "MORENO CO. — Arte".
+  - The live theme is now this "Arte 360°" theme (MAIN), which the Admin API can't write. Changes go to the duplicate **"MORENO CO. — Arte 360° + Peluche"** (id 189003432181) and the merchant publishes it.
   - `sections/moreno-360.liquid` is the viewer section. It loads three r128 from cdnjs plus `assets/moreno-viewer.min.js`.
     - Its color list is a section setting (`key:Name:#hex`), and the textures are theme assets `moreno-lienzo-<key>.webp` / `-h.png`.
     - It picks the initial color from the product's selected variant and follows the theme's variant picker by listening for `change` events. "Set I · Onyx" maps to `onyx`.

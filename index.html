@@ -75,9 +75,13 @@
       <div class="section-head reveal">
         <p class="eyebrow eyebrow--sun">360°</p>
         <h2>Gírala. Elige tu color.</h2>
-        <p class="lead">Arrastra para rotar la camiseta y toca un color para verla con su foto real.</p>
+        <p class="lead">Arrastra para girar cada pieza. En la camiseta, toca un color para verla con su foto real.</p>
       </div>
-      <div class="viewer__wrap" id="viewer360" data-moreno-360 data-tex="assets/img/lienzo/{c}.webp" data-height="assets/img/lienzo/{c}-h.png" data-color="sand">
+      <div class="segmented viewer__switch" role="tablist" aria-label="Pieza">
+        <button type="button" role="tab" id="tabLienzo" aria-controls="viewer360" aria-selected="true">Camiseta Lienzo</button>
+        <button type="button" role="tab" id="tabPeluche" aria-controls="viewerPeluche" aria-selected="false">Peluche</button>
+      </div>
+      <div class="viewer__wrap" id="viewer360" role="tabpanel" aria-labelledby="tabLienzo" data-moreno-360 data-tex="assets/img/lienzo/{c}.webp" data-height="assets/img/lienzo/{c}-h.png" data-color="sand">
         <div class="viewer__stage" id="viewerStage" data-stage>
           <canvas id="viewerCanvas" aria-label="Visor 3D de la camiseta Lienzo. Arrastra para girar." role="img"></canvas>
           <div class="viewer__fallback" data-fallback hidden>
@@ -106,6 +110,32 @@
           <button type="button" role="radio" data-c="rose" aria-label="Rosé" style="--sw:#dc84a6"></button>
         </div>
         <p class="viewer__colorname" id="viewerColorName">Sand</p>
+        <div class="segmented" role="tablist" aria-label="Vista">
+          <button role="tab" data-view="front" aria-selected="true">Frente</button>
+          <button role="tab" data-view="side">Perfil</button>
+          <button role="tab" data-view="back">Espalda</button>
+          <button role="tab" data-view="spin" class="segmented__spin" aria-label="Girar automáticamente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="viewer__wrap" id="viewerPeluche" role="tabpanel" aria-labelledby="tabPeluche" hidden data-moreno-360 data-lazy
+        data-model="assets/img/peluche/modelo.json" data-mesh="assets/img/peluche/modelo.bin" data-atlas="assets/img/peluche/atlas.webp"
+        data-front="assets/img/peluche/frente.webp" data-back="assets/img/peluche/espalda.webp">
+        <div class="viewer__stage" data-stage>
+          <canvas aria-label="Visor 3D del peluche. Arrastra para girar." role="img"></canvas>
+          <div class="viewer__fallback" data-fallback hidden>
+            <div class="flip" data-flip>
+              <img class="flip__face" alt="Peluche de frente">
+              <img class="flip__face flip__face--back" alt="Peluche de espalda">
+            </div>
+          </div>
+          <div class="viewer__hint" data-hint>
+            <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Arrastra para girar
+          </div>
+        </div>
+        <p class="viewer__colorname">36 cm sentado · 42 cm de pie</p>
         <div class="segmented" role="tablist" aria-label="Vista">
           <button role="tab" data-view="front" aria-selected="true">Frente</button>
           <button role="tab" data-view="side">Perfil</button>

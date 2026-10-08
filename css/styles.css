@@ -170,6 +170,7 @@ p { margin: 0; }
 /* ---------- Visor 3D ---------- */
 .viewer { background: var(--mist); padding: 120px 0 100px; text-align: center; }
 .viewer__colors { justify-content: center; margin-top: 28px; padding: 0 16px; }
+.viewer__switch { margin-top: 32px; }
 .viewer__colorname { margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--ink); }
 .viewer__wrap.is-loading .viewer__stage { opacity: .85; }
 .viewer__stage {

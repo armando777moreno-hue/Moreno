@@ -245,6 +245,20 @@
     };
   }
 
+  /* ---------- Visor 360°: camiseta o peluche ---------- */
+  (function pieceSwitch() {
+    var tabs = document.querySelectorAll('.viewer__switch [role="tab"]');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) {
+          var on = t === tab;
+          t.setAttribute('aria-selected', String(on));
+          document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        });
+      });
+    });
+  })();
+
   /* ---------- Carril de highlights ---------- */
   (function rail() {
     var rail = $('#rail'), cards = rail.querySelectorAll('.card'), dots = $('#railDots');
