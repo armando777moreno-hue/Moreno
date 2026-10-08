@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "principal": { "type": "mn-producto", "settings": { "mostrar_visor": true, "max_fotos": 4 } },
+    "rueda": { "type": "mn-color", "settings": { "producto": "lienzo-acid-wash-oversized-tee", "padding_top": 48 } },
+    "detalles": {
+      "type": "mn-detalles",
+      "blocks": {
+        "p1": { "type": "punto", "settings": { "titulo": "Lavado ácido", "texto": "El acabado lavado cambia de una pieza a otra: no hay dos iguales.", "x": 52, "y": 55 } },
+        "p2": { "type": "punto", "settings": { "titulo": "Hombro caído", "texto": "Corte oversize, con la costura del hombro bajando hacia el brazo.", "x": 24, "y": 30 } },
+        "p3": { "type": "punto", "settings": { "titulo": "Algodón pesado", "texto": "Tela con cuerpo, para llevar sola o debajo de otra pieza.", "x": 70, "y": 78 } }
+      },
+      "block_order": ["p1", "p2", "p3"],
+      "settings": {}
+    },
+    "relacionados": { "type": "mn-bento", "settings": { "collection": "todo", "titulo": "Completa el look.", "etiqueta": "También te puede gustar", "max_productos": 4, "columnas": 3 } }
+  },
+  "order": ["principal", "rueda", "detalles", "relacionados"]
+}

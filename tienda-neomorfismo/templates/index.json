@@ -1,0 +1,34 @@
+{
+  "sections": {
+    "apertura": { "type": "mn-hero", "settings": { "boton_url": "shopify://products/lienzo-acid-wash-oversized-tee", "boton2_url": "#colores" } },
+    "banda": {
+      "type": "mn-marquesina",
+      "blocks": {
+        "f1": { "type": "frase", "settings": { "texto": "El lienzo, antes del primer trazo" } },
+        "f2": { "type": "frase", "settings": { "texto": "Lavado ácido" } },
+        "f3": { "type": "frase", "settings": { "texto": "Once colores" } },
+        "f4": { "type": "frase", "settings": { "texto": "Oversize unisex" } },
+        "f5": { "type": "frase", "settings": { "texto": "Drop 001 — Refranes" } }
+      },
+      "block_order": ["f1", "f2", "f3", "f4", "f5"],
+      "settings": {}
+    },
+    "rueda": { "type": "mn-color", "settings": { "producto": "lienzo-acid-wash-oversized-tee" } },
+    "mosaico": { "type": "mn-bento", "settings": { "collection": "todo" } },
+    "manifiesto": { "type": "mn-frase", "settings": {} },
+    "detalles": {
+      "type": "mn-detalles",
+      "blocks": {
+        "p1": { "type": "punto", "settings": { "titulo": "Lavado ácido", "texto": "El acabado lavado cambia de una pieza a otra: no hay dos iguales.", "x": 52, "y": 55 } },
+        "p2": { "type": "punto", "settings": { "titulo": "Hombro caído", "texto": "Corte oversize, con la costura del hombro bajando hacia el brazo.", "x": 24, "y": 30 } },
+        "p3": { "type": "punto", "settings": { "titulo": "Algodón pesado", "texto": "Tela con cuerpo, para llevar sola o debajo de otra pieza.", "x": 70, "y": 78 } },
+        "p4": { "type": "punto", "settings": { "titulo": "Unisex", "texto": "Oversize por diseño: para un ajuste clásico, pide una talla menos.", "x": 50, "y": 20 } }
+      },
+      "block_order": ["p1", "p2", "p3", "p4"],
+      "settings": {}
+    },
+    "panoramica": { "type": "mn-panorama", "settings": {} },
+    "cierre": { "type": "mn-cierre", "settings": { "boton_url": "shopify://collections/todo" } }
+  },
+  "order": ["apertura", "banda", "rueda", "mosaico", "manifiesto", "detalles", "panoramica", "cierre"]
+}

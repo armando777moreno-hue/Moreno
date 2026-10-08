@@ -1,0 +1,62 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<section class="mn-section mn-escena" data-mn-detalles>
+  <div class="mn-container mn-detalle__grid">
+    <div class="mn-detalle__lienzo mn-relieve mn-reveal" data-mn-3d style="--mn-3d-x: 0deg; --mn-3d-y: 16deg;">
+      {%- if s.imagen != blank -%}
+        <img src="{{ s.imagen | image_url: width: 1200 }}" alt="{{ s.imagen.alt | escape }}" loading="lazy">
+      {%- else -%}
+        <img src="{{ 'moreno-lienzo-espresso.webp' | asset_url }}" alt="Camiseta Lienzo en color Espresso" loading="lazy" width="1024" height="1024">
+      {%- endif -%}
+      {%- for block in section.blocks -%}
+        <button type="button" class="mn-punto" style="--x: {{ block.settings.x }}%; --y: {{ block.settings.y }}%;"
+          aria-label="{{ block.settings.titulo | escape }}" aria-expanded="false" {{ block.shopify_attributes }}></button>
+      {%- endfor -%}
+    </div>
+    <div>
+      {%- if s.etiqueta != blank -%}<p class="mn-etiqueta mn-reveal">{{ s.etiqueta }}</p>{%- endif -%}
+      <h2 class="mn-display mn-head__titulo mn-reveal" style="margin: 12px 0 32px;">{{ s.titulo }}</h2>
+      <ul class="mn-detalle__lista">
+        {%- for block in section.blocks -%}
+          <li class="mn-detalle__item mn-relieve mn-reveal" data-delay="{{ forloop.index }}">
+            <h3>{{ block.settings.titulo }}</h3>
+            <p>{{ block.settings.texto | newline_to_br }}</p>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Detalles con puntos",
+  "tag": "div",
+  "settings": [
+    { "type": "image_picker", "id": "imagen", "label": "Foto de la prenda (fondo transparente ideal)" },
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "De cerca" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Lo que no se ve en la foto." },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    { "type": "punto", "name": "Punto de detalle", "settings": [
+      { "type": "text", "id": "titulo", "label": "Título", "default": "Detalle" },
+      { "type": "textarea", "id": "texto", "label": "Texto", "default": "Describe este detalle." },
+      { "type": "range", "id": "x", "label": "Posición horizontal", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 },
+      { "type": "range", "id": "y", "label": "Posición vertical", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+    ] }
+  ],
+  "presets": [{ "name": "MN · Detalles con puntos", "blocks": [
+    { "type": "punto", "settings": { "titulo": "Lavado ácido", "texto": "El acabado lavado cambia de una pieza a otra: no hay dos iguales.", "x": 52, "y": 55 } },
+    { "type": "punto", "settings": { "titulo": "Hombro caído", "texto": "Corte oversize, con la costura del hombro bajando hacia el brazo.", "x": 24, "y": 30 } },
+    { "type": "punto", "settings": { "titulo": "Algodón pesado", "texto": "Tela con cuerpo, para llevar sola o debajo de otra pieza.", "x": 70, "y": 78 } },
+    { "type": "punto", "settings": { "titulo": "Unisex", "texto": "Oversize por diseño: para un ajuste clásico, pide una talla menos.", "x": 50, "y": 20 } }
+  ] }]
+}
+{% endschema %}

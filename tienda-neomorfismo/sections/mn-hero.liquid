@@ -1,0 +1,73 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{%- assign tex = 'moreno-lienzo-COLOR.webp' | asset_url | replace: 'COLOR', '{c}' -%}
+{%- assign hmap = 'moreno-lienzo-COLOR-h.png' | asset_url | replace: 'COLOR', '{c}' -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+  #shopify-section-{{ section.id }} .mn-section h1.mn-hero__title { font-size: clamp(52px, 8.4vw, {{ s.titulo_max }}px); }
+{% endstyle %}
+<section class="mn-section mn-hero" data-mn-hero>
+  <div class="mn-container mn-hero__grid">
+    <div class="mn-hero__card mn-relieve mn-reveal">
+      {%- if s.etiqueta != blank -%}<p class="mn-etiqueta">{{ s.etiqueta }}</p>{%- endif -%}
+      <h1 class="mn-display mn-hero__title">{{ s.titulo }}{%- if s.titulo_cursiva != blank -%} <em>{{ s.titulo_cursiva }}</em>{%- endif -%}</h1>
+      {%- if s.subtitulo != blank -%}<p class="mn-lead mn-hero__sub">{{ s.subtitulo | newline_to_br }}</p>{%- endif -%}
+      <div class="mn-hero__ctas">
+        {%- if s.boton_texto != blank -%}<a class="mn-btn mn-btn--acento" href="{{ s.boton_url | default: '/collections/all' }}">{{ s.boton_texto }}</a>{%- endif -%}
+        {%- if s.boton2_texto != blank -%}<a class="mn-btn" href="{{ s.boton2_url | default: '#' }}">{{ s.boton2_texto }}</a>{%- endif -%}
+      </div>
+    </div>
+    <div class="mn-hero__stage mn-reveal" data-delay="2">
+      <div class="mn-hero__disco mn-hundido" aria-hidden="true"></div>
+      {%- if s.mostrar_visor -%}
+        <div class="mn-360" data-moreno-360 data-tex="{{ tex }}" data-height="{{ hmap }}" data-color="{{ s.color_inicial | handleize }}" data-scroll="{{ s.vueltas }}">
+          <div data-stage>
+            <canvas aria-label="Camiseta en 3D. Arrastra para girarla." role="img"></canvas>
+            <div data-fallback hidden><div data-flip><img alt="Frente"><img alt="Espalda"></div></div>
+          </div>
+        </div>
+        <p class="mn-hero__giro mn-relieve mn-etiqueta">
+          <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M40 21l5-.5-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          {{ s.texto_giro }}
+        </p>
+      {%- elsif s.imagen != blank -%}
+        <img src="{{ s.imagen | image_url: width: 1400 }}" alt="{{ s.imagen.alt | escape }}" loading="eager" fetchpriority="high" style="position:absolute;inset:8%;width:84%;height:84%;object-fit:contain">
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+{%- if s.mostrar_visor -%}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="{{ 'mn-viewer.min.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "MN · Apertura 3D",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "MORENO.co · Luxury Essentials" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "El lienzo," },
+    { "type": "text", "id": "titulo_cursiva", "label": "Segunda línea en cursiva", "default": "antes del primer trazo." },
+    { "type": "textarea", "id": "subtitulo", "label": "Subtítulo", "default": "Algodón pesado con lavado ácido: ninguna pieza sale igual. Once colores, corte oversize." },
+    { "type": "range", "id": "titulo_max", "label": "Tamaño máximo del título", "min": 60, "max": 160, "step": 4, "unit": "px", "default": 132 },
+    { "type": "header", "content": "Botones" },
+    { "type": "text", "id": "boton_texto", "label": "Botón principal", "default": "Comprar Lienzo" },
+    { "type": "url", "id": "boton_url", "label": "Enlace del botón principal" },
+    { "type": "text", "id": "boton2_texto", "label": "Botón secundario", "default": "Ver colores" },
+    { "type": "url", "id": "boton2_url", "label": "Enlace del botón secundario" },
+    { "type": "header", "content": "Camiseta 3D" },
+    { "type": "checkbox", "id": "mostrar_visor", "label": "Mostrar la camiseta en 3D", "default": true },
+    { "type": "text", "id": "color_inicial", "label": "Color con el que empieza", "default": "Sand" },
+    { "type": "range", "id": "vueltas", "label": "Vueltas al deslizar la página", "min": 0, "max": 3, "step": 0.5, "default": 1 },
+    { "type": "text", "id": "texto_giro", "label": "Texto bajo la camiseta", "default": "Desliza o arrastra para girar" },
+    { "type": "image_picker", "id": "imagen", "label": "Imagen (si apagas el 3D)" },
+    { "type": "header", "content": "Color y espacio" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 }
+  ],
+  "presets": [{ "name": "MN · Apertura 3D" }]
+}
+{% endschema %}

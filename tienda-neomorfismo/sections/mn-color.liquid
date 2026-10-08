@@ -1,0 +1,92 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{%- assign p = s.producto -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+  #shopify-section-{{ section.id }} .mn-dial { container-type: inline-size; }
+  #shopify-section-{{ section.id }} .mn-dial__punto { --r: 43cqw; }
+{% endstyle %}
+<section class="mn-section" data-mn-color id="colores">
+  <div class="mn-container">
+    {%- if p == blank -%}
+      {%- if request.design_mode -%}<p class="mn-aviso-editor">Elige el producto en el panel de la derecha para llenar la rueda de colores.</p>{%- endif -%}
+    {%- else -%}
+      {%- assign color_opt = p.options_by_name['Color'] | default: p.options_by_name['Colour'] -%}
+      {%- assign pos = color_opt.position | minus: 1 -%}
+      {%- assign tonos = s.tonos | split: ',' -%}
+      {%- capture puntos -%}
+        {%- assign n = 0 -%}
+        {%- for valor in color_opt.values -%}
+          {%- if valor contains '·' -%}{%- continue -%}{%- endif -%}
+          {%- assign n = n | plus: 1 -%}
+        {%- endfor -%}
+        {%- assign i = 0 -%}
+        {%- for valor in color_opt.values -%}
+          {%- if valor contains '·' -%}{%- continue -%}{%- endif -%}
+          {%- assign clave = valor | handleize -%}
+          {%- assign hex = '#b9b1a5' -%}
+          {%- for t in tonos -%}
+            {%- assign par = t | split: ':' -%}
+            {%- assign tk = par[0] | strip -%}
+            {%- if tk == clave -%}{%- assign hex = par[1] | strip -%}{%- endif -%}
+          {%- endfor -%}
+          {%- assign var_id = '' -%}{%- assign var_precio = '' -%}
+          {%- for v in p.variants -%}
+            {%- if v.options[pos] == valor -%}{%- assign var_id = v.id -%}{%- assign var_precio = v.price | money -%}{%- break -%}{%- endif -%}
+          {%- endfor -%}
+          {%- assign angulo = i | times: 360 | divided_by: n -%}
+          {%- assign img = 'moreno-lienzo-' | append: clave | append: '.webp' | asset_url -%}
+          <button type="button" class="mn-dial__punto" role="radio" aria-checked="false" aria-label="{{ valor | escape }}"
+            style="--a: {{ angulo }}deg; --sw: {{ hex }};" data-nombre="{{ valor | escape }}" data-img="{{ img }}"
+            data-precio="{{ var_precio }}" data-url="{{ p.url }}?variant={{ var_id }}"></button>
+          {%- assign i = i | plus: 1 -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- assign inicio = 0 -%}{%- assign k = 0 -%}
+      {%- assign buscado = s.color_inicial | handleize -%}
+      {%- for valor in color_opt.values -%}
+        {%- if valor contains '·' -%}{%- continue -%}{%- endif -%}
+        {%- assign clave = valor | handleize -%}
+        {%- if clave == buscado -%}{%- assign inicio = k -%}{%- endif -%}
+        {%- assign k = k | plus: 1 -%}
+      {%- endfor -%}
+      <div class="mn-color__grid">
+        <div class="mn-dial mn-relieve mn-reveal" data-mn-dial data-inicio="{{ inicio }}" role="radiogroup" aria-label="{{ s.titulo | escape }}">
+          <div class="mn-dial__aro">{{ puntos }}</div>
+          <div class="mn-dial__centro mn-hundido">
+            <img class="mn-dial__prenda" src="{{ 'moreno-lienzo-sand.webp' | asset_url }}" alt="" width="1024" height="1024" loading="lazy">
+          </div>
+        </div>
+        <div class="mn-color__info mn-reveal" data-delay="2">
+          {%- if s.etiqueta != blank -%}<p class="mn-etiqueta">{{ s.etiqueta }}</p>{%- endif -%}
+          <h2 class="mn-display mn-head__titulo">{{ s.titulo }}</h2>
+          <p class="mn-lead">{{ s.texto | newline_to_br }}</p>
+          <p class="mn-display mn-color__nombre" data-mn-nombre aria-live="polite"></p>
+          <p class="mn-color__precio" data-mn-precio></p>
+          <div><a class="mn-btn mn-btn--acento" data-mn-comprar href="{{ p.url }}">{{ s.boton_texto }}</a></div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Rueda de color",
+  "tag": "div",
+  "settings": [
+    { "type": "product", "id": "producto", "label": "Prenda de la rueda" },
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "Gira la rueda" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Un corte. Once colores." },
+    { "type": "textarea", "id": "texto", "label": "Texto", "default": "Toca un color o arrastra en círculo sobre la rueda. Cada tono es la foto real de la prenda." },
+    { "type": "text", "id": "color_inicial", "label": "Color con el que empieza", "default": "Sand" },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Comprar en este color" },
+    { "type": "textarea", "id": "tonos", "label": "Color de cada punto (clave:#color, separados por comas)", "default": "onyx:#323338, ink:#111015, bone:#dfe1f2, stone:#7b7b7d, ash:#95969a, sand:#dbd0c3, espresso:#937663, oxblood:#d51625, midnight:#171b30, dusty-rose:#f689b4, rose:#dc84a6" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [{ "name": "MN · Rueda de color" }]
+}
+{% endschema %}

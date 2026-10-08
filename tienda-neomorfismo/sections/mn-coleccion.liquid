@@ -1,0 +1,57 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<section class="mn-section mn-escena">
+  <div class="mn-container">
+    <header class="mn-col-head mn-hundido mn-reveal" style="margin-bottom: clamp(32px, 5vw, 64px);">
+      <p class="mn-etiqueta">{{ collection.products_count }} {% if collection.products_count == 1 %}{{ s.texto_pieza }}{% else %}{{ s.texto_piezas }}{% endif %}</p>
+      <h1 class="mn-display">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="mn-lead">{{ collection.description }}</div>
+      {%- elsif s.texto != blank -%}
+        <p class="mn-lead">{{ s.texto | newline_to_br }}</p>
+      {%- endif -%}
+    </header>
+    {%- paginate collection.products by s.por_pagina -%}
+      <h2 class="mn-sr">{{ s.texto_piezas | capitalize }}</h2>
+      <div class="mn-bento mn-bento--plano" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
+        {%- for product in collection.products -%}
+          {%- assign d = forloop.index | modulo: 6 -%}
+          {%- render 'mn-tarjeta', product: product, indice: forloop.index, numerar: s.numerar, mostrar_tallas: s.mostrar_tallas, hover: true, delay: d -%}
+        {%- else -%}
+          <p class="mn-lead">{{ s.texto_vacio }}</p>
+        {%- endfor -%}
+      </div>
+      {%- if paginate.pages > 1 -%}
+        <nav class="mn-footer__links" style="justify-content: center; margin-top: 48px;" aria-label="Páginas">
+          {%- if paginate.previous -%}<a class="mn-btn" href="{{ paginate.previous.url }}">← Anterior</a>{%- endif -%}
+          {%- if paginate.next -%}<a class="mn-btn" href="{{ paginate.next.url }}">Siguiente →</a>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Colección",
+  "tag": "div",
+  "settings": [
+    { "type": "textarea", "id": "texto", "label": "Texto si la colección no tiene descripción", "default": "Piezas esenciales, hechas para durar y para combinar." },
+    { "type": "text", "id": "texto_pieza", "label": "Palabra para 1 prenda", "default": "pieza" },
+    { "type": "text", "id": "texto_piezas", "label": "Palabra para varias prendas", "default": "piezas" },
+    { "type": "text", "id": "texto_vacio", "label": "Texto si no hay prendas", "default": "Pronto habrá piezas nuevas aquí." },
+    { "type": "range", "id": "por_pagina", "label": "Prendas por página", "min": 4, "max": 48, "step": 4, "default": 24 },
+    { "type": "range", "id": "columnas", "label": "Columnas en ordenador", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "select", "id": "columnas_movil", "label": "Columnas en móvil", "options": [{ "value": "1", "label": "1" }, { "value": "2", "label": "2" }], "default": "2" },
+    { "type": "checkbox", "id": "numerar", "label": "Numerar las prendas", "default": true },
+    { "type": "checkbox", "id": "mostrar_tallas", "label": "Mostrar las tallas", "default": true },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ]
+}
+{% endschema %}

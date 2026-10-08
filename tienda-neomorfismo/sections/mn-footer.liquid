@@ -1,0 +1,41 @@
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<div class="mn-section">
+  <div class="mn-container mn-footer">
+    <p class="mn-footer__marca mn-marca" aria-label="{{ shop.name | escape }}">{{ s.marca }}</p>
+    <div class="mn-footer__fila">
+      <p class="mn-lead" style="max-width: 40ch;">{{ s.frase | newline_to_br }}</p>
+      {%- if s.menu != blank -%}
+        <nav class="mn-footer__links" aria-label="{{ s.menu.title | escape }}">
+          {%- for link in s.menu.links -%}<a class="mn-relieve" href="{{ link.url }}">{{ link.title }}</a>{%- endfor -%}
+        </nav>
+      {%- endif -%}
+    </div>
+    <div class="mn-footer__fila mn-etiqueta">
+      <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
+      <span class="mn-footer__links">
+        {%- for policy in shop.policies -%}<a href="{{ policy.url }}">{{ policy.title }}</a>{%- endfor -%}
+      </span>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "MN · Pie de página",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "marca", "label": "Nombre grande", "default": "MORENO.co" },
+    { "type": "textarea", "id": "frase", "label": "Frase", "default": "Luxury Essentials. Piezas que empiezan en tela desnuda." },
+    { "type": "link_list", "id": "menu", "label": "Menú de enlaces", "default": "footer" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 }
+  ],
+  "enabled_on": { "groups": ["footer"] },
+  "presets": [{ "name": "MN · Pie de página" }]
+}
+{% endschema %}

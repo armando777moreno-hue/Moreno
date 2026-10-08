@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MORENO.co — Luxury Essentials</title>
+  <meta name="description" content="MORENO.co · Luxury Essentials. Lienzo: camiseta oversize de algodón pesado con lavado ácido, en once colores.">
+  <meta name="theme-color" content="#f5f5f7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Navegación global -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a class="wordmark" href="#top" aria-label="MORENO.co inicio">MORENO<span>.co</span></a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="#viewer">360°</a>
+        <a href="#arte">Lienzo</a>
+        <a href="#colores">Colores</a>
+        <a href="#detalles">Detalles</a>
+        <a href="#inspiracion">Inspiración</a>
+        <a href="#coleccion">Colección</a>
+        <a href="#comprar">Comprar</a>
+      </nav>
+      <button class="bag-btn" id="bagBtn" aria-label="Abrir bolsa">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="bag-btn__count" id="bagCount" hidden>0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sub-nav de producto (estilo Apple) -->
+  <div class="subnav" id="subnav">
+    <div class="subnav__inner">
+      <span class="subnav__title">Lienzo</span>
+      <div class="subnav__actions">
+        <a href="#viewer" class="subnav__link">Ver en 360°</a>
+        <a href="#comprar" class="btn btn--sm">Comprar</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero__light" aria-hidden="true"></div>
+      <div class="hero__grain" id="grain" aria-hidden="true"></div>
+      <div class="hero__copy reveal">
+        <p class="eyebrow">Nuevo · Luxury Essentials</p>
+        <h1 class="hero__title">Lienzo.</h1>
+        <p class="hero__sub">El lienzo, antes del primer trazo.</p>
+        <div class="hero__ctas">
+          <a href="#comprar" class="btn">Comprar</a>
+          <a href="#viewer" class="link-arrow">Gírala en 360°</a>
+        </div>
+      </div>
+      <div class="hero__stage" id="heroStage">
+        <div class="hero__shirts" id="heroShirts">
+          <img class="hero__shirt is-on" src="assets/img/lienzo/sand.webp" alt="Camiseta Lienzo de MORENO.co en color Sand" width="1024" height="1024">
+          <img class="hero__shirt" src="assets/img/lienzo/onyx.webp" alt="" width="1024" height="1024" loading="lazy">
+          <img class="hero__shirt" src="assets/img/lienzo/espresso.webp" alt="" width="1024" height="1024" loading="lazy">
+          <img class="hero__shirt" src="assets/img/lienzo/stone.webp" alt="" width="1024" height="1024" loading="lazy">
+        </div>
+        <div class="hero__shadow" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- VISOR 3D -->
+    <section class="viewer" id="viewer">
+      <div class="section-head reveal">
+        <p class="eyebrow eyebrow--sun">360°</p>
+        <h2>Gírala. Elige tu color.</h2>
+        <p class="lead">Arrastra para girar cada pieza. En la camiseta, toca un color para verla con su foto real.</p>
+      </div>
+      <div class="segmented viewer__switch" role="tablist" aria-label="Pieza">
+        <button type="button" role="tab" id="tabLienzo" aria-controls="viewer360" aria-selected="true">Camiseta Lienzo</button>
+        <button type="button" role="tab" id="tabPeluche" aria-controls="viewerPeluche" aria-selected="false">Peluche</button>
+      </div>
+      <div class="viewer__wrap" id="viewer360" role="tabpanel" aria-labelledby="tabLienzo" data-moreno-360 data-tex="assets/img/lienzo/{c}.webp" data-height="assets/img/lienzo/{c}-h.png" data-color="sand">
+        <div class="viewer__stage" id="viewerStage" data-stage>
+          <canvas id="viewerCanvas" aria-label="Visor 3D de la camiseta Lienzo. Arrastra para girar." role="img"></canvas>
+          <div class="viewer__fallback" data-fallback hidden>
+            <div class="flip" data-flip>
+              <img class="flip__face" alt="Frente">
+              <img class="flip__face flip__face--back" alt="Espalda">
+            </div>
+          </div>
+          <div class="viewer__floor" aria-hidden="true"></div>
+          <div class="viewer__hint" data-hint>
+            <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Arrastra para girar
+          </div>
+        </div>
+        <div class="viewer__colors" role="radiogroup" aria-label="Color">
+          <button type="button" role="radio" data-c="onyx" aria-label="Onyx" style="--sw:#323338"></button>
+          <button type="button" role="radio" data-c="ink" aria-label="Ink" style="--sw:#111015"></button>
+          <button type="button" role="radio" data-c="bone" aria-label="Bone" style="--sw:#dfe1f2"></button>
+          <button type="button" role="radio" data-c="stone" aria-label="Stone" style="--sw:#7b7b7d"></button>
+          <button type="button" role="radio" data-c="ash" aria-label="Ash" style="--sw:#95969a"></button>
+          <button type="button" role="radio" data-c="sand" aria-label="Sand" style="--sw:#dbd0c3"></button>
+          <button type="button" role="radio" data-c="espresso" aria-label="Espresso" style="--sw:#937663"></button>
+          <button type="button" role="radio" data-c="oxblood" aria-label="Oxblood" style="--sw:#d51625"></button>
+          <button type="button" role="radio" data-c="midnight" aria-label="Midnight" style="--sw:#171b30"></button>
+          <button type="button" role="radio" data-c="dusty-rose" aria-label="Dusty Rose" style="--sw:#f689b4"></button>
+          <button type="button" role="radio" data-c="rose" aria-label="Rosé" style="--sw:#dc84a6"></button>
+        </div>
+        <p class="viewer__colorname" id="viewerColorName">Sand</p>
+        <div class="segmented" role="tablist" aria-label="Vista">
+          <button role="tab" data-view="front" aria-selected="true">Frente</button>
+          <button role="tab" data-view="side">Perfil</button>
+          <button role="tab" data-view="back">Espalda</button>
+          <button role="tab" data-view="spin" class="segmented__spin" aria-label="Girar automáticamente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="viewer__wrap" id="viewerPeluche" role="tabpanel" aria-labelledby="tabPeluche" hidden data-moreno-360 data-lazy
+        data-model="assets/img/peluche/modelo.json" data-mesh="assets/img/peluche/modelo.bin" data-atlas="assets/img/peluche/atlas.webp"
+        data-front="assets/img/peluche/frente.webp" data-back="assets/img/peluche/espalda.webp">
+        <div class="viewer__stage" data-stage>
+          <canvas aria-label="Visor 3D del peluche. Arrastra para girar." role="img"></canvas>
+          <div class="viewer__fallback" data-fallback hidden>
+            <div class="flip" data-flip>
+              <img class="flip__face" alt="Peluche de frente">
+              <img class="flip__face flip__face--back" alt="Peluche de espalda">
+            </div>
+          </div>
+          <div class="viewer__hint" data-hint>
+            <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Arrastra para girar
+          </div>
+        </div>
+        <p class="viewer__colorname">36 cm sentado · 42 cm de pie</p>
+        <div class="segmented" role="tablist" aria-label="Vista">
+          <button role="tab" data-view="front" aria-selected="true">Frente</button>
+          <button role="tab" data-view="side">Perfil</button>
+          <button role="tab" data-view="back">Espalda</button>
+          <button role="tab" data-view="spin" class="segmented__spin" aria-label="Girar automáticamente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTE (scroll) -->
+    <section class="art" id="arte">
+      <div class="art__pin">
+      <canvas class="art__sky" id="sky" aria-hidden="true"></canvas>
+      <div class="art__sticky">
+        <div class="art__copy">
+          <p class="eyebrow eyebrow--sun">El lienzo</p>
+          <h2 class="art__title">
+            <span class="art__line">Algodón pesado.</span>
+            <span class="art__line">Lavado ácido.</span>
+            <span class="art__line art__line--sun">Ninguna igual.</span>
+          </h2>
+        </div>
+        <figure class="art__frame" id="artFrame">
+          <img src="assets/img/lienzo/detail-wash.jpg" alt="Primer plano del lavado ácido de la tela de Lienzo" loading="lazy">
+        </figure>
+      </div>
+      </div>
+    </section>
+
+    <!-- COLORES -->
+    <section class="highlights" id="colores">
+      <div class="section-head section-head--left reveal">
+        <h2>Once colores.<br>Un solo corte.</h2>
+      </div>
+      <div class="rail" id="rail">
+        <article class="card card--tall card--color" style="--sw:#323338">
+          <img src="assets/img/lienzo/onyx.webp" alt="Lienzo en color Onyx" loading="lazy">
+          <div class="card__caption"><strong>Onyx</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#111015">
+          <img src="assets/img/lienzo/ink.webp" alt="Lienzo en color Ink" loading="lazy">
+          <div class="card__caption"><strong>Ink</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#dfe1f2">
+          <img src="assets/img/lienzo/bone.webp" alt="Lienzo en color Bone" loading="lazy">
+          <div class="card__caption"><strong>Bone</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#7b7b7d">
+          <img src="assets/img/lienzo/stone.webp" alt="Lienzo en color Stone" loading="lazy">
+          <div class="card__caption"><strong>Stone</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#95969a">
+          <img src="assets/img/lienzo/ash.webp" alt="Lienzo en color Ash" loading="lazy">
+          <div class="card__caption"><strong>Ash</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#dbd0c3">
+          <img src="assets/img/lienzo/sand.webp" alt="Lienzo en color Sand" loading="lazy">
+          <div class="card__caption"><strong>Sand</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#937663">
+          <img src="assets/img/lienzo/espresso.webp" alt="Lienzo en color Espresso" loading="lazy">
+          <div class="card__caption"><strong>Espresso</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#d51625">
+          <img src="assets/img/lienzo/oxblood.webp" alt="Lienzo en color Oxblood" loading="lazy">
+          <div class="card__caption"><strong>Oxblood</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#171b30">
+          <img src="assets/img/lienzo/midnight.webp" alt="Lienzo en color Midnight" loading="lazy">
+          <div class="card__caption"><strong>Midnight</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#f689b4">
+          <img src="assets/img/lienzo/dusty-rose.webp" alt="Lienzo en color Dusty Rose" loading="lazy">
+          <div class="card__caption"><strong>Dusty Rose</strong></div>
+        </article>
+        <article class="card card--tall card--color" style="--sw:#dc84a6">
+          <img src="assets/img/lienzo/rose.webp" alt="Lienzo en color Rosé" loading="lazy">
+          <div class="card__caption"><strong>Rosé</strong></div>
+        </article>
+      </div>
+      <div class="rail__controls">
+        <div class="rail__dots" id="railDots"></div>
+        <div class="rail__arrows">
+          <button class="round-btn" id="railPrev" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="round-btn" id="railNext" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETALLES (bento) -->
+    <section class="details" id="detalles">
+      <div class="section-head reveal">
+        <p class="eyebrow">Detalles</p>
+        <h2>Esencial por fuera.<br>Cuidado por dentro.</h2>
+      </div>
+      <div class="bento">
+        <div class="tile tile--photo tile--wide reveal">
+          <img src="assets/img/lienzo/detail-wash.jpg" alt="Textura de la tela con lavado ácido" loading="lazy">
+          <div class="tile__text tile__text--light"><h3>Lavado ácido.</h3><p>Cada pieza sale distinta: no hay dos iguales.</p></div>
+        </div>
+        <div class="tile tile--type reveal">
+          <span class="tile__big" id="oversizeWord">Oversize</span>
+          <p>Corte amplio y hombro caído. Unisex.</p>
+        </div>
+        <div class="tile tile--photo reveal">
+          <img src="assets/img/lienzo/detail-shoulder.jpg" alt="Hombro caído y cuello acanalado de la camiseta" loading="lazy">
+          <div class="tile__text"><h3>Hombro caído.</h3><p>Cuello acanalado y costuras visibles.</p></div>
+        </div>
+        <div class="tile tile--sets reveal">
+          <div class="tile__text"><h3>Sets de dos.</h3><p>Dos piezas en un solo pedido.</p><a class="link-arrow link-arrow--dark" href="#comprar">Ver sets</a></div>
+        </div>
+        <div class="tile tile--fabric reveal">
+          <canvas id="fabric" aria-hidden="true"></canvas>
+          <div class="tile__text"><h3>Algodón pesado.</h3><p>Para usar solo, o debajo de tu pieza más ruidosa.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSPIRACIÓN -->
+    <section class="inspo" id="inspiracion">
+      <div class="inspo__media">
+        <img class="inspo__img" id="inspoImg" src="assets/img/la-perla-dusk.jpg" alt="Casas de colores junto al mar al anochecer en San Juan, Puerto Rico" loading="lazy">
+      </div>
+      <div class="inspo__copy reveal">
+        <p class="eyebrow eyebrow--sun">Inspiración</p>
+        <h2>Nacida entre colores del Caribe.</h2>
+        <p class="lead lead--light">Fachadas pastel, mar abierto y la última luz del día. De ahí sale cada pieza.</p>
+        <p class="place">San Juan, Puerto Rico</p>
+      </div>
+    </section>
+
+    <section class="palette" aria-labelledby="paletteTitle">
+      <div class="section-head reveal">
+        <h2 id="paletteTitle">La paleta de la isla.</h2>
+        <p class="lead">Una ilustración programada a partir de los colores de sus casas.</p>
+      </div>
+      <div class="palette__grid">
+        <svg class="skyline" id="skyline" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Ilustración generada de casas de colores frente al mar"></svg>
+        <figure class="palette__night reveal">
+          <img src="assets/img/la-perla-night.jpg" alt="Casas de colores iluminadas de noche bajo la luna" loading="lazy">
+        </figure>
+      </div>
+      <ul class="swatches" id="swatches"></ul>
+    </section>
+
+    <!-- COLECCIÓN (catálogo de Shopify) -->
+    <section class="collection" id="coleccion">
+      <div class="section-head reveal">
+        <p class="eyebrow">Drop 001</p>
+        <h2>La colección.</h2>
+        <p class="lead">Cada pieza empieza como un lienzo en blanco.</p>
+      </div>
+      <div class="collection__grid" id="collectionGrid"></div>
+    </section>
+
+    <!-- COMPRAR -->
+    <section class="buy" id="comprar">
+      <div class="buy__grid">
+        <div class="buy__gallery">
+          <div class="buy__main"><img id="buyMain" class="is-contain" src="assets/img/lienzo/sand.webp" alt="Lienzo en color Sand"></div>
+          <a class="buy__360 link-arrow link-arrow--dark" href="#viewer">Verla en 360°</a>
+        </div>
+        <div class="buy__panel">
+          <p class="eyebrow">Nuevo</p>
+          <h2 class="buy__title">Lienzo</h2>
+          <p class="buy__kind">Acid Wash Oversized Tee</p>
+          <p class="buy__price" id="price"></p>
+          <div class="field">
+            <span class="field__label">Color · <strong id="colorName">Sand</strong></span>
+            <div class="color-pick" id="colorPick" role="radiogroup" aria-label="Color"></div>
+          </div>
+          <div class="field">
+            <span class="field__label">Sets de dos piezas</span>
+            <div class="set-pick" id="setPick" role="radiogroup" aria-label="Set"></div>
+          </div>
+          <div class="field">
+            <span class="field__label">Talla</span>
+            <div class="sizes" id="sizes" role="radiogroup" aria-label="Talla"></div>
+          </div>
+          <button class="btn btn--block" id="addToBag" disabled>Elige una talla</button>
+          <ul class="buy__notes">
+            <li>Oversize por diseño: para un ajuste clásico, pide una talla menos.</li>
+            <li>Lavar en frío, del revés y con colores similares. Secar colgada.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <a class="wordmark wordmark--dark" href="#top">MORENO<span>.co</span></a>
+      <p class="footer__tag">Luxury Essentials</p>
+      <p class="footer__copy">© <span id="year"></span> MORENO.co. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Bolsa -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="bag" id="bag" aria-label="Bolsa" aria-hidden="true">
+    <div class="bag__head">
+      <h2>Bolsa</h2>
+      <button class="round-btn" id="bagClose" aria-label="Cerrar bolsa"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <ul class="bag__list" id="bagList"></ul>
+    <div class="bag__foot">
+      <div class="bag__total"><span>Subtotal</span><strong id="bagTotal"></strong></div>
+      <button class="btn btn--block" id="checkout" disabled>Pagar</button>
+      <p class="bag__note">Pago seguro con Shopify.</p>
+    </div>
+  </aside>
+
+  <script src="js/vendor/three.min.js" defer></script>
+  <script src="js/viewer.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

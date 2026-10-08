@@ -1,0 +1,47 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+  #shopify-section-{{ section.id }} .mn-pano__capa img { object-position: center {{ s.foco }}; }
+  #shopify-section-{{ section.id }} .mn-pano__velo { --mn-velo: {{ s.oscurecer | divided_by: 100.0 }}; }
+{% endstyle %}
+<section class="mn-section">
+  <div class="mn-container mn-pano">
+    <div class="mn-pano__ventana mn-relieve" data-mn-3d style="--mn-3d-x: 6deg;">
+      <div class="mn-pano__capa" data-mn-parallax="{{ s.paralaje | divided_by: 100.0 }}">
+        {%- if s.imagen != blank -%}
+          <img src="{{ s.imagen | image_url: width: 2400 }}" alt="{{ s.imagen.alt | escape }}" loading="lazy">
+        {%- else -%}
+          <img src="{{ 'mn-la-perla.jpg' | asset_url }}" alt="Casas de colores junto al mar al anochecer en San Juan, Puerto Rico" loading="lazy">
+        {%- endif -%}
+      </div>
+      <div class="mn-pano__velo"></div>
+      <div class="mn-pano__card mn-relieve" data-mn-3d>
+        {%- if s.etiqueta != blank -%}<p class="mn-etiqueta">{{ s.etiqueta }}</p>{%- endif -%}
+        <h2 class="mn-display">{{ s.titulo }}</h2>
+        <p class="mn-lead" style="color: var(--mn-tinta);">{{ s.texto | newline_to_br }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Panorámica 3D",
+  "tag": "div",
+  "settings": [
+    { "type": "image_picker", "id": "imagen", "label": "Foto apaisada" },
+    { "type": "select", "id": "foco", "label": "Parte de la foto que se prioriza", "options": [{ "value": "top", "label": "Arriba" }, { "value": "center", "label": "Centro" }, { "value": "70%", "label": "Abajo" }], "default": "70%" },
+    { "type": "range", "id": "paralaje", "label": "Intensidad de la profundidad", "min": 0, "max": 40, "step": 2, "default": 26 },
+    { "type": "range", "id": "oscurecer", "label": "Oscurecer la foto", "min": 0, "max": 70, "step": 5, "unit": "%", "default": 45 },
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "San Juan, Puerto Rico" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Nacida entre colores del Caribe." },
+    { "type": "textarea", "id": "texto", "label": "Texto", "default": "Fachadas pastel, mar abierto y la última luz del día." },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [{ "name": "MN · Panorámica 3D" }]
+}
+{% endschema %}

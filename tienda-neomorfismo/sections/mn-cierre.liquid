@@ -1,0 +1,35 @@
+<script src="{{ 'mn-scripts.js' | asset_url }}" defer></script>
+{%- assign s = section.settings -%}
+{% style %}
+  #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+{% endstyle %}
+<section class="mn-section mn-cierre">
+  <div class="mn-container">
+    {%- if s.etiqueta != blank -%}<p class="mn-etiqueta mn-reveal">{{ s.etiqueta }}</p>{%- endif -%}
+    <p class="mn-cierre__logo mn-marca" data-mn-cierre aria-label="{{ s.logo_texto | escape }}">
+      {%- assign letras = s.logo_texto | split: '' -%}
+      {%- for l in letras -%}<span aria-hidden="true">{% if l == ' ' %}&nbsp;{% else %}{{ l }}{% endif %}</span>{%- endfor -%}
+    </p>
+    <p class="mn-lead mn-cierre__texto mn-reveal">{{ s.texto | newline_to_br }}</p>
+    {%- if s.boton_texto != blank -%}<a class="mn-btn mn-btn--acento mn-reveal" href="{{ s.boton_url | default: '/collections/all' }}">{{ s.boton_texto }}</a>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "MN · Cierre con logo",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "Luxury Essentials" },
+    { "type": "text", "id": "logo_texto", "label": "Texto gigante", "default": "MORENO.co" },
+    { "type": "textarea", "id": "texto", "label": "Texto", "default": "Empieza por el lienzo. Lo demás lo pones tú." },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Ir a la tienda" },
+    { "type": "url", "id": "boton_url", "label": "Enlace del botón" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 120 }
+  ],
+  "presets": [{ "name": "MN · Cierre con logo" }]
+}
+{% endschema %}

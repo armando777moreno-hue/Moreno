@@ -1,0 +1,207 @@
+{%- comment -%}
+  MORENO.co — visor 360° de Lienzo con sus colores reales (estilo apple.com).
+  Texturas: assets/moreno-lienzo-<color>.webp y -h.png. Lógica: assets/moreno-viewer.min.js
+  (generado desde js/viewer.js del repositorio).
+  Opcional: el peluche 3D en una segunda pestaña (assets/moreno-peluche-*, generados por
+  tools/build_peluche.py). Se descarga solo cuando el cliente abre esa pestaña.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- assign colors = s.colors | split: ',' -%}
+{%- assign first = colors.first | split: ':' -%}
+{%- assign start = first[0] | strip -%}
+{%- if closest.product -%}
+  {%- assign current = closest.product.selected_or_first_available_variant.options.first | handleize -%}
+  {%- assign tail = current | split: '-' | last -%}
+  {%- assign found = false -%}
+  {%- for c in colors -%}
+    {%- assign key = c | split: ':' | first | strip -%}
+    {%- if current == key -%}{%- assign start = key -%}{%- assign found = true -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+  {%- unless found -%}
+    {%- comment -%} Sets ("Set I · Onyx" → set-i-onyx): usar el color base. {%- endcomment -%}
+    {%- for c in colors -%}
+      {%- assign key = c | split: ':' | first | strip -%}
+      {%- if tail == key -%}{%- assign start = key -%}{%- break -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endunless -%}
+{%- endif -%}
+{%- assign tex = 'moreno-lienzo-COLOR.webp' | asset_url | replace: 'COLOR', '{c}' -%}
+{%- assign hmap = 'moreno-lienzo-COLOR-h.png' | asset_url | replace: 'COLOR', '{c}' -%}
+<section
+  class="m360"
+  style="--m360-bg: {{ s.color_bg }}; --m360-ink: {{ s.color_ink }}; --m360-muted: {{ s.color_muted }}; --m360-pt: {{ s.padding_top }}px; --m360-pb: {{ s.padding_bottom }}px;"
+>
+  <div class="m360__head">
+    {%- if s.eyebrow != blank -%}<p class="m360__eyebrow">{{ s.eyebrow | escape }}</p>{%- endif -%}
+    {%- if s.heading != blank -%}<h2 class="m360__title">{{ s.heading | escape }}</h2>{%- endif -%}
+    {%- if s.text != blank -%}<p class="m360__lead">{{ s.text | escape }}</p>{%- endif -%}
+  </div>
+
+  {%- if s.mostrar_peluche -%}
+    <div class="m360__segmented m360__switch" role="tablist" aria-label="Pieza">
+      <button type="button" role="tab" id="m360-tab-a-{{ section.id }}" aria-controls="m360-a-{{ section.id }}" aria-selected="true">{{ s.nombre_camiseta | escape }}</button>
+      <button type="button" role="tab" id="m360-tab-b-{{ section.id }}" aria-controls="m360-b-{{ section.id }}" aria-selected="false">{{ s.nombre_peluche | escape }}</button>
+    </div>
+  {%- endif -%}
+
+  <div class="m360__viewer" id="m360-a-{{ section.id }}" {% if s.mostrar_peluche %}role="tabpanel" aria-labelledby="m360-tab-a-{{ section.id }}"{% endif %} data-moreno-360 data-tex="{{ tex }}" data-height="{{ hmap }}" data-color="{{ start }}">
+    <div class="m360__stage" data-stage>
+      <canvas aria-label="Visor 3D de la camiseta. Arrastra para girar." role="img"></canvas>
+      <div class="m360__fallback" data-fallback hidden>
+        <div class="m360__flip" data-flip>
+          <img class="m360__face" alt="Frente" loading="lazy">
+          <img class="m360__face m360__face--back" alt="Espalda" loading="lazy">
+        </div>
+      </div>
+      <div class="m360__floor" aria-hidden="true"></div>
+      <div class="m360__hint" data-hint>
+        <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Arrastra para girar
+      </div>
+    </div>
+    <div class="m360__colors" role="radiogroup" aria-label="Color">
+      {%- for c in colors -%}
+        {%- assign parts = c | split: ':' -%}
+        <button type="button" role="radio" data-c="{{ parts[0] | strip }}" aria-label="{{ parts[1] | strip | escape }}" title="{{ parts[1] | strip | escape }}" style="--sw: {{ parts[2] | strip }}"></button>
+      {%- endfor -%}
+    </div>
+    <div class="m360__segmented" role="tablist" aria-label="Vista">
+      <button type="button" role="tab" data-view="front" aria-selected="true">Frente</button>
+      <button type="button" role="tab" data-view="side">Perfil</button>
+      <button type="button" role="tab" data-view="back">Espalda</button>
+      <button type="button" role="tab" data-view="spin" class="m360__spin" aria-label="Girar automáticamente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  {%- if s.mostrar_peluche -%}
+    <div class="m360__viewer" id="m360-b-{{ section.id }}" role="tabpanel" aria-labelledby="m360-tab-b-{{ section.id }}" hidden
+      data-moreno-360 data-lazy
+      data-model="{{ 'moreno-peluche-modelo.json' | asset_url }}" data-mesh="{{ 'moreno-peluche-modelo.bin' | asset_url }}"
+      data-atlas="{{ 'moreno-peluche-atlas.webp' | asset_url }}"
+      data-front="{{ 'moreno-peluche-frente.webp' | asset_url }}" data-back="{{ 'moreno-peluche-espalda.webp' | asset_url }}">
+      <div class="m360__stage" data-stage>
+        <canvas aria-label="Visor 3D del peluche. Arrastra para girar." role="img"></canvas>
+        <div class="m360__fallback" data-fallback hidden>
+          <div class="m360__flip" data-flip>
+            <img class="m360__face" alt="Peluche de frente" loading="lazy">
+            <img class="m360__face m360__face--back" alt="Peluche de espalda" loading="lazy">
+          </div>
+        </div>
+        <div class="m360__hint" data-hint>
+          <svg viewBox="0 0 64 24" aria-hidden="true"><ellipse cx="32" cy="14" rx="28" ry="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M40 21l5-0.5-3-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Arrastra para girar
+        </div>
+      </div>
+      {%- if s.medidas_peluche != blank -%}<p class="m360__note">{{ s.medidas_peluche | escape }}</p>{%- endif -%}
+      <div class="m360__segmented" role="tablist" aria-label="Vista">
+        <button type="button" role="tab" data-view="front" aria-selected="true">Frente</button>
+        <button type="button" role="tab" data-view="side">Perfil</button>
+        <button type="button" role="tab" data-view="back">Espalda</button>
+        <button type="button" role="tab" data-view="spin" class="m360__spin" aria-label="Girar automáticamente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+</section>
+
+<script>
+  // Pestañas Camiseta / Peluche: muestran un visor y ocultan el otro.
+  (function () {
+    if (window.__moreno360Switch) return;
+    window.__moreno360Switch = true;
+    document.addEventListener('click', function (e) {
+      var tab = e.target.closest && e.target.closest('.m360__switch [role="tab"]');
+      if (!tab) return;
+      tab.parentNode.querySelectorAll('[role="tab"]').forEach(function (t) {
+        var on = t === tab, panel = document.getElementById(t.getAttribute('aria-controls'));
+        t.setAttribute('aria-selected', String(on));
+        if (panel) panel.hidden = !on;
+      });
+    });
+  })();
+  // Si el cliente elige un color en el selector de variantes del producto, el visor lo sigue.
+  (function () {
+    if (window.__moreno360Sync) return;
+    window.__moreno360Sync = true;
+    function key(v) {
+      v = String(v || '').split('·').pop();
+      return v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, '-');
+    }
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+      if (!t || !t.value || (t.type !== 'radio' && t.tagName !== 'SELECT')) return;
+      var k = key(t.tagName === 'SELECT' ? t.options[t.selectedIndex].text : t.value);
+      document.querySelectorAll('[data-moreno-360]').forEach(function (v) {
+        if (v.morenoSetColor && v.querySelector('[data-c="' + k + '"]')) v.morenoSetColor(k);
+      });
+    });
+  })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="{{ 'moreno-viewer.min.js' | asset_url }}" defer></script>
+
+{% stylesheet %}
+  .m360 { padding: var(--m360-pt) 20px var(--m360-pb); background: var(--m360-bg); color: var(--m360-ink); text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', Arial, sans-serif; letter-spacing: -0.01em; }
+  .m360__eyebrow { margin: 0 0 10px; font-size: 17px; font-weight: 600; background: linear-gradient(90deg, #ff9f45, #ff5e3a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .m360__title { margin: 0; font-size: clamp(32px, 5.4vw, 56px); line-height: 1.07; font-weight: 700; letter-spacing: -0.025em; color: var(--m360-ink); }
+  .m360__lead { max-width: 640px; margin: 16px auto 0; font-size: clamp(17px, 2vw, 21px); line-height: 1.45; color: var(--m360-muted); }
+  .m360__stage { position: relative; width: min(900px, 100%); aspect-ratio: 1 / 1; max-height: 78vh; margin: 40px auto 0; border-radius: 28px; overflow: hidden;
+    background: radial-gradient(70% 60% at 50% 42%, #fff 0%, #f1ede6 55%, #e3ddd3 100%);
+    touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+  .m360__stage.is-dragging { cursor: grabbing; }
+  .m360__stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .m360__floor { position: absolute; left: 22%; right: 22%; bottom: 7%; height: 7%; border-radius: 50%; background: radial-gradient(closest-side, rgba(60, 45, 30, .28), transparent); pointer-events: none; }
+  .m360__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--m360-muted);
+    padding: 8px 14px; border-radius: 980px; background: rgba(255, 255, 255, .7); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: opacity .6s ease; pointer-events: none; }
+  .m360__hint svg { width: 34px; height: 14px; }
+  .m360__hint.is-hidden { opacity: 0; }
+  .m360__fallback { position: absolute; inset: 6%; perspective: 1600px; }
+  .m360__flip { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 1s ease; }
+  .m360__face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; backface-visibility: hidden; }
+  .m360__face--back { transform: rotateY(180deg) scaleX(-1); }
+  .m360__colors { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+  .m360__colors button { width: 32px; height: 32px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: var(--sw);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); transition: box-shadow .2s, transform .2s; }
+  .m360__colors button:hover { transform: scale(1.08); }
+  .m360__colors button[aria-checked='true'] { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15), 0 0 0 2px var(--m360-bg), 0 0 0 4px #0071e3; }
+  .m360__viewer.is-loading .m360__stage { opacity: .85; }
+  .m360__segmented { display: inline-flex; gap: 4px; margin-top: 28px; padding: 4px; border-radius: 980px; background: rgba(0, 0, 0, .06); }
+  .m360__segmented button { border: 0; background: transparent; padding: 8px 18px; border-radius: 980px; font: inherit; font-size: 14px; font-weight: 500; color: var(--m360-muted); cursor: pointer; transition: background .25s, color .25s, box-shadow .25s; }
+  .m360__segmented button[aria-selected='true'] { background: #fff; color: var(--m360-ink); box-shadow: 0 2px 8px rgba(0, 0, 0, .1); }
+  .m360__spin { display: grid; place-items: center; padding: 8px 12px !important; }
+  .m360__switch { margin-top: 32px; }
+  .m360__viewer[hidden] { display: none; }
+  .m360__note { margin: 20px 0 0; font-size: 15px; font-weight: 600; color: var(--m360-ink); }
+  .m360__spin svg { width: 18px; height: 18px; }
+  @media (max-width: 560px) { .m360__segmented button { padding: 8px 14px; } }
+  @media (prefers-reduced-motion: reduce) { .m360__flip, .m360__hint { transition: none; } }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "MORENO 360°",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Antetítulo", "default": "360°" },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Gírala. Elige tu color." },
+    { "type": "text", "id": "text", "label": "Texto", "default": "Arrastra para girar cada pieza. En la camiseta, toca un color para verla con su foto real." },
+    { "type": "textarea", "id": "colors", "label": "Colores", "info": "clave:Nombre:#hex separados por comas. Cada clave necesita assets/moreno-lienzo-<clave>.webp y -h.png.", "default": "onyx:Onyx:#323338, ink:Ink:#111015, bone:Bone:#dfe1f2, stone:Stone:#7b7b7d, ash:Ash:#95969a, sand:Sand:#dbd0c3, espresso:Espresso:#937663, oxblood:Oxblood:#d51625, midnight:Midnight:#171b30, dusty-rose:Dusty Rose:#f689b4, rose:Rosé:#dc84a6" },
+    { "type": "header", "content": "Peluche 3D" },
+    { "type": "checkbox", "id": "mostrar_peluche", "label": "Mostrar el peluche en una segunda pestaña", "default": true },
+    { "type": "text", "id": "nombre_camiseta", "label": "Nombre de la pestaña de la camiseta", "default": "Camiseta Lienzo" },
+    { "type": "text", "id": "nombre_peluche", "label": "Nombre de la pestaña del peluche", "default": "Peluche" },
+    { "type": "text", "id": "medidas_peluche", "label": "Medidas del peluche", "default": "36 cm sentado · 42 cm de pie" },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_bg", "label": "Fondo", "default": "#F5F5F7" },
+    { "type": "color", "id": "color_ink", "label": "Texto", "default": "#1D1D1F" },
+    { "type": "color", "id": "color_muted", "label": "Texto secundario", "default": "#6E6E73" },
+    { "type": "header", "content": "Espacio" },
+    { "type": "range", "id": "padding_top", "label": "Arriba", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Abajo", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 88 }
+  ],
+  "presets": [{ "name": "MORENO 360°" }]
+}
+{% endschema %}
