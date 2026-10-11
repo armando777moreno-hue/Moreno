@@ -51,3 +51,7 @@ Es un duplicado de Horizon: se reemplazaron el inicio, la página de producto, l
 - Títulos sin saltos: los acordeones usan `h2` y la descripción pasa de `h4` a `h3`; la colección lleva un `h2` oculto.
 - Las fuentes y los estilos se cargan desde el layout, no desde cada sección. `will-change` se quitó de los estilos en reposo. La segunda foto de las tarjetas no se pinta en pantallas táctiles.
 - Las plantillas de la tienda (por ejemplo `templates/index.json`) pueden tener ajustes guardados desde el editor. No se suben desde aquí, para no pisarlos.
+
+## Legal y privacidad (11/10)
+
+Ver `LEGAL.md`: aviso de cookies, consentimiento en formularios, datos del negocio en el pie, fuentes y three.js servidos desde el tema, políticas en `legal/` (para pegar en Ajustes → Políticas) y contenido revisado.

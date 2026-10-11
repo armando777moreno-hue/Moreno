@@ -25,10 +25,19 @@
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-palette' -%}
 
-    {%- comment -%} MORENO.co — Neomorfismo: fuentes y estilos mn- una sola vez, en paralelo y antes de pintar {%- endcomment -%}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+    {%- comment -%}
+      MORENO.co — Neomorfismo: fuentes servidas desde el propio tema (sin Google Fonts, que
+      recibiría la IP del visitante antes de cualquier consentimiento) y estilos mn- una sola vez.
+      Licencias de las fuentes (SIL OFL 1.1): carpeta licencias/ del repositorio.
+    {%- endcomment -%}
+    <link rel="preload" href="{{ 'mn-manrope.woff2' | asset_url }}" as="font" type="font/woff2" crossorigin>
+    <style>
+      @font-face { font-family: 'Manrope'; src: url('{{ 'mn-manrope.woff2' | asset_url }}') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+      @font-face { font-family: 'Cormorant Garamond'; src: url('{{ 'mn-cormorant-600.woff2' | asset_url }}') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+      @font-face { font-family: 'Cormorant Garamond'; src: url('{{ 'mn-cormorant-500i.woff2' | asset_url }}') format('woff2'); font-weight: 500; font-style: italic; font-display: swap; }
+      @font-face { font-family: 'DM Mono'; src: url('{{ 'mn-dmmono-400.woff2' | asset_url }}') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+      @font-face { font-family: 'DM Mono'; src: url('{{ 'mn-dmmono-500.woff2' | asset_url }}') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+    </style>
     {{ 'mn-styles.css' | asset_url | stylesheet_tag }}
 
     {% if request.design_mode %}
@@ -179,5 +188,7 @@
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}
+
+    {%- render 'mn-cookies' -%}
   </body>
 </html>

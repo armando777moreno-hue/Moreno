@@ -1,34 +1,230 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "apertura": { "type": "mn-hero", "settings": { "boton_url": "shopify://products/lienzo-acid-wash-oversized-tee", "boton2_url": "#colores" } },
+    "apertura": {
+      "type": "mn-hero",
+      "settings": {
+        "etiqueta": "MORENO.co · Luxury Essentials",
+        "titulo": "El lienzo,",
+        "titulo_cursiva": "antes del primer trazo.",
+        "subtitulo": "Algodón pesado con lavado ácido: ninguna pieza sale igual. Once colores, corte oversize.",
+        "titulo_max": 132,
+        "boton_texto": "Comprar Lienzo",
+        "boton_url": "shopify://products/lienzo-acid-wash-oversized-tee",
+        "boton2_texto": "Ver colores",
+        "boton2_url": "#colores",
+        "mostrar_visor": true,
+        "color_inicial": "Sand",
+        "vueltas": 1,
+        "texto_giro": "Desliza o arrastra para girar",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 48,
+        "padding_bottom": 64
+      }
+    },
     "banda": {
       "type": "mn-marquesina",
       "blocks": {
-        "f1": { "type": "frase", "settings": { "texto": "El lienzo, antes del primer trazo" } },
-        "f2": { "type": "frase", "settings": { "texto": "Lavado ácido" } },
-        "f3": { "type": "frase", "settings": { "texto": "Once colores" } },
-        "f4": { "type": "frase", "settings": { "texto": "Oversize unisex" } },
-        "f5": { "type": "frase", "settings": { "texto": "Drop 001 — Refranes" } }
+        "f1": {
+          "type": "frase",
+          "settings": {
+            "texto": "El lienzo, antes del primer trazo"
+          }
+        },
+        "f2": {
+          "type": "frase",
+          "settings": {
+            "texto": "Lavado ácido"
+          }
+        },
+        "f3": {
+          "type": "frase",
+          "settings": {
+            "texto": "Once colores"
+          }
+        },
+        "f4": {
+          "type": "frase",
+          "settings": {
+            "texto": "Oversize unisex"
+          }
+        },
+        "f5": {
+          "type": "frase",
+          "settings": {
+            "texto": "Drop 001 — Refranes"
+          }
+        }
       },
-      "block_order": ["f1", "f2", "f3", "f4", "f5"],
-      "settings": {}
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4",
+        "f5"
+      ],
+      "settings": {
+        "separador": "✦",
+        "velocidad": 40,
+        "direccion": "left",
+        "etiqueta_accesible": "Novedades de MORENO.co",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 24,
+        "padding_bottom": 56
+      }
     },
-    "rueda": { "type": "mn-color", "settings": { "producto": "lienzo-acid-wash-oversized-tee" } },
-    "mosaico": { "type": "mn-bento", "settings": { "collection": "todo" } },
-    "manifiesto": { "type": "mn-frase", "settings": {} },
+    "rueda": {
+      "type": "mn-color",
+      "settings": {
+        "producto": "lienzo-acid-wash-oversized-tee",
+        "etiqueta": "Gira la rueda",
+        "titulo": "Un corte. Once colores.",
+        "texto": "Toca un color o arrastra en círculo sobre la rueda. Cada tono es la foto real de la prenda.",
+        "color_inicial": "Sand",
+        "boton_texto": "Comprar en este color",
+        "tonos": "onyx:#323338, ink:#111015, bone:#dfe1f2, stone:#7b7b7d, ash:#95969a, sand:#dbd0c3, espresso:#937663, oxblood:#d51625, midnight:#171b30, dusty-rose:#f689b4, rose:#dc84a6",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "mosaico": {
+      "type": "mn-bento",
+      "settings": {
+        "collection": "todo",
+        "etiqueta": "La colección",
+        "titulo": "Piezas para llevar puestas.",
+        "texto_boton": "Ver todo",
+        "max_productos": 6,
+        "columnas": 3,
+        "columnas_movil": "2",
+        "numerar": true,
+        "mostrar_tallas": false,
+        "hover_segunda_foto": true,
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 80,
+        "padding_bottom": 96
+      }
+    },
+    "manifiesto": {
+      "type": "mn-frase",
+      "settings": {
+        "etiqueta": "Manifiesto",
+        "frase": "Cada pieza de MORENO empieza en tela desnuda. Lienzo es esa tela, sin pintar: para llevarla sola, o debajo de tu pieza más ruidosa.",
+        "palabras_acento": "desnuda, lienzo, ruidosa",
+        "tamano": 68,
+        "alineacion": "left",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
     "detalles": {
       "type": "mn-detalles",
       "blocks": {
-        "p1": { "type": "punto", "settings": { "titulo": "Lavado ácido", "texto": "El acabado lavado cambia de una pieza a otra: no hay dos iguales.", "x": 52, "y": 55 } },
-        "p2": { "type": "punto", "settings": { "titulo": "Hombro caído", "texto": "Corte oversize, con la costura del hombro bajando hacia el brazo.", "x": 24, "y": 30 } },
-        "p3": { "type": "punto", "settings": { "titulo": "Algodón pesado", "texto": "Tela con cuerpo, para llevar sola o debajo de otra pieza.", "x": 70, "y": 78 } },
-        "p4": { "type": "punto", "settings": { "titulo": "Unisex", "texto": "Oversize por diseño: para un ajuste clásico, pide una talla menos.", "x": 50, "y": 20 } }
+        "p1": {
+          "type": "punto",
+          "settings": {
+            "titulo": "Lavado ácido",
+            "texto": "El acabado lavado cambia de una pieza a otra: no hay dos iguales.",
+            "x": 52,
+            "y": 55
+          }
+        },
+        "p2": {
+          "type": "punto",
+          "settings": {
+            "titulo": "Hombro caído",
+            "texto": "Corte oversize, con la costura del hombro bajando hacia el brazo.",
+            "x": 24,
+            "y": 30
+          }
+        },
+        "p3": {
+          "type": "punto",
+          "settings": {
+            "titulo": "Algodón pesado",
+            "texto": "Tela con cuerpo, para llevar sola o debajo de otra pieza.",
+            "x": 70,
+            "y": 78
+          }
+        },
+        "p4": {
+          "type": "punto",
+          "settings": {
+            "titulo": "Unisex",
+            "texto": "Oversize por diseño: para un ajuste clásico, pide una talla menos.",
+            "x": 50,
+            "y": 20
+          }
+        }
       },
-      "block_order": ["p1", "p2", "p3", "p4"],
-      "settings": {}
+      "block_order": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "settings": {
+        "etiqueta": "De cerca",
+        "titulo": "Lo que no se ve en la foto.",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 80,
+        "padding_bottom": 96
+      }
     },
-    "panoramica": { "type": "mn-panorama", "settings": {} },
-    "cierre": { "type": "mn-cierre", "settings": { "boton_url": "shopify://collections/todo" } }
+    "panoramica": {
+      "type": "mn-panorama",
+      "settings": {
+        "foco": "70%",
+        "paralaje": 26,
+        "oscurecer": 45,
+        "etiqueta": "San Juan, Puerto Rico",
+        "titulo": "Inspirada en los colores del Caribe.",
+        "texto": "Fachadas pastel, mar abierto y la última luz del día.",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 64,
+        "padding_bottom": 96
+      }
+    },
+    "cierre": {
+      "type": "mn-cierre",
+      "settings": {
+        "etiqueta": "Luxury Essentials",
+        "logo_texto": "MORENO.co",
+        "texto": "Empieza por el lienzo. Lo demás lo pones tú.",
+        "boton_texto": "Ir a la tienda",
+        "boton_url": "shopify://collections/todo",
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 96,
+        "padding_bottom": 120
+      }
+    }
   },
-  "order": ["apertura", "banda", "rueda", "mosaico", "manifiesto", "detalles", "panoramica", "cierre"]
+  "order": [
+    "apertura",
+    "banda",
+    "rueda",
+    "mosaico",
+    "manifiesto",
+    "detalles",
+    "panoramica",
+    "cierre"
+  ]
 }

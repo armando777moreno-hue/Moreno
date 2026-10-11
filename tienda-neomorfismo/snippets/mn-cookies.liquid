@@ -1,0 +1,162 @@
+{%- comment -%}
+  MORENO.co — Aviso y preferencias de cookies.
+
+  Guarda la elección con la Customer Privacy API de Shopify (setTrackingConsent), así que
+  las analíticas de Shopify y los píxeles de apps respetan lo que elija el visitante.
+  - Se muestra mientras no haya una decisión guardada para analíticas, marketing o preferencias.
+  - «Rechazar opcionales» pesa lo mismo que «Aceptar todas» (mismo tamaño y estilo).
+  - Cualquier elemento con [data-mn-cookies-abrir] (p. ej. el enlace del pie) lo reabre en
+    modo configuración.
+  - Si la tienda activa el banner nativo de Shopify (Ajustes > Privacidad del cliente), este
+    no se muestra para no duplicar avisos.
+{%- endcomment -%}
+{%- liquid
+  assign pagina_cookies = pages['politica-de-cookies']
+  assign url_cookies = '/pages/politica-de-cookies'
+  if pagina_cookies != blank
+    assign url_cookies = pagina_cookies.url
+  endif
+  assign url_privacidad = shop.privacy_policy.url | default: '/policies/privacy-policy'
+-%}
+<section class="mn-cookies" id="mn-cookies" role="region" aria-labelledby="mn-cookies-titulo" hidden>
+  <div class="mn-cookies__caja">
+    <h2 class="mn-cookies__titulo" id="mn-cookies-titulo">Tu privacidad</h2>
+    <p class="mn-cookies__texto">
+      Usamos cookies necesarias para que la tienda funcione (carrito, pago y seguridad). Con tu permiso,
+      también usamos cookies de preferencias, de analítica para entender cómo se usa la tienda y de
+      marketing para mostrarte anuncios relevantes. Puedes cambiar tu elección cuando quieras desde
+      «Preferencias de cookies», al pie de la página.
+      <a href="{{ url_cookies }}">Política de cookies</a> ·
+      <a href="{{ url_privacidad }}">Política de privacidad</a>
+    </p>
+
+    <form class="mn-cookies__opciones" id="mn-cookies-opciones" hidden>
+      <fieldset>
+        <legend class="mn-cookies__leyenda">Elige qué cookies aceptas</legend>
+        <label class="mn-cookies__opcion">
+          <input type="checkbox" checked disabled>
+          <span><strong>Necesarias</strong> Siempre activas: sin ellas no funcionan el carrito ni el pago.</span>
+        </label>
+        <label class="mn-cookies__opcion">
+          <input type="checkbox" name="preferences">
+          <span><strong>Preferencias</strong> Recuerdan opciones como el idioma o el país.</span>
+        </label>
+        <label class="mn-cookies__opcion">
+          <input type="checkbox" name="analytics">
+          <span><strong>Analítica</strong> Estadísticas de visitas para mejorar la tienda.</span>
+        </label>
+        <label class="mn-cookies__opcion">
+          <input type="checkbox" name="marketing">
+          <span><strong>Marketing</strong> Anuncios y campañas según tu actividad.</span>
+        </label>
+      </fieldset>
+    </form>
+
+    <div class="mn-cookies__botones">
+      <button type="button" class="mn-cookies__btn" data-mn-cookies="rechazar">Rechazar opcionales</button>
+      <button type="button" class="mn-cookies__btn" data-mn-cookies="configurar" aria-controls="mn-cookies-opciones" aria-expanded="false">Configurar</button>
+      <button type="button" class="mn-cookies__btn" data-mn-cookies="guardar" hidden>Guardar selección</button>
+      <button type="button" class="mn-cookies__btn" data-mn-cookies="aceptar">Aceptar todas</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mn-cookies { position: fixed; z-index: 2147483000; left: 16px; right: 16px; bottom: 16px; display: flex; justify-content: center; pointer-events: none;
+    font-family: var(--mn-cuerpo, -apple-system, 'Helvetica Neue', Arial, sans-serif); color: var(--mn-tinta, #3A332C); }
+  .mn-cookies[hidden] { display: none; }
+  .mn-cookies__caja { pointer-events: auto; width: min(720px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 22px 24px; border-radius: 24px;
+    background: var(--mn-fondo, #E9E4DC);
+    box-shadow: 12px 12px 28px var(--mn-sombra-fuerte, rgba(150, 137, 118, .7)), -10px -10px 24px var(--mn-luz, rgba(255, 255, 255, .85));
+    animation: mn-cookies-entra .5s cubic-bezier(.22, 1, .36, 1); }
+  @keyframes mn-cookies-entra { from { opacity: 0; transform: translateY(24px); } }
+  .mn-cookies__titulo { margin: 0 0 8px; font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+  .mn-cookies__texto { margin: 0; font-size: 14px; line-height: 1.55; color: var(--mn-tinta-suave, #675E53); }
+  .mn-cookies__texto a { color: var(--mn-tinta, #3A332C); text-decoration: underline; text-underline-offset: 2px; }
+  .mn-cookies__opciones fieldset { margin: 16px 0 0; padding: 0; border: 0; display: grid; gap: 10px; }
+  .mn-cookies__leyenda { margin-bottom: 4px; font-size: 13px; font-weight: 700; }
+  .mn-cookies__opcion { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; font-size: 14px; line-height: 1.45; cursor: pointer; }
+  .mn-cookies__opcion strong { display: block; color: var(--mn-tinta, #3A332C); }
+  .mn-cookies__opcion span { color: var(--mn-tinta-suave, #675E53); }
+  .mn-cookies__opcion input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--mn-acento-texto, #9E4A26); }
+  .mn-cookies__opcion input:disabled { opacity: .6; }
+  .mn-cookies__botones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .mn-cookies__btn { flex: 1 1 150px; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer;
+    font: 700 14px/1 var(--mn-cuerpo, -apple-system, 'Helvetica Neue', Arial, sans-serif); color: var(--mn-tinta, #3A332C); background: var(--mn-fondo, #E9E4DC);
+    box-shadow: 6px 6px 14px var(--mn-sombra, rgba(170, 158, 140, .55)), -6px -6px 14px var(--mn-luz, rgba(255, 255, 255, .85)); }
+  .mn-cookies__btn:active { box-shadow: inset 4px 4px 10px var(--mn-sombra, rgba(170, 158, 140, .55)), inset -4px -4px 10px var(--mn-luz, rgba(255, 255, 255, .85)); }
+  .mn-cookies__btn:focus-visible, .mn-cookies a:focus-visible, .mn-cookies__opcion input:focus-visible { outline: 2px solid var(--mn-acento-texto, #9E4A26); outline-offset: 3px; }
+  .mn-cookies__btn[hidden] { display: none; }
+  @media (prefers-reduced-motion: reduce) { .mn-cookies__caja { animation: none; } }
+</style>
+
+<script>
+  (function () {
+    if (window.__mnCookies) return;
+    window.__mnCookies = true;
+    var caja = document.getElementById('mn-cookies');
+    if (!caja) return;
+    var opciones = document.getElementById('mn-cookies-opciones');
+    var btn = function (k) { return caja.querySelector('[data-mn-cookies="' + k + '"]'); };
+    var api = null;
+
+    function marcar(c) {
+      ['preferences', 'analytics', 'marketing'].forEach(function (k) { opciones.elements[k].checked = !!c[k]; });
+    }
+    function abrir(configurar) {
+      caja.hidden = false;
+      if (configurar) mostrarOpciones(true);
+    }
+    function mostrarOpciones(si) {
+      opciones.hidden = !si;
+      btn('configurar').hidden = si;
+      btn('configurar').setAttribute('aria-expanded', String(si));
+      btn('guardar').hidden = !si;
+      if (si) opciones.querySelector('input:not([disabled])').focus();
+    }
+    function guardar(c) {
+      caja.hidden = true;
+      if (api && api.setTrackingConsent) {
+        api.setTrackingConsent({ analytics: c.analytics, marketing: c.marketing, preferences: c.preferences }, function () {});
+      }
+      try { localStorage.setItem('mn-consentimiento', JSON.stringify(c)); } catch (e) { /* modo privado */ }
+    }
+    function actual() { // lo que haya decidido el visitante (si decidió)
+      if (api && api.currentVisitorConsent) {
+        var v = api.currentVisitorConsent() || {};
+        var decidido = ['analytics', 'marketing', 'preferences'].every(function (k) { return v[k] === 'yes' || v[k] === 'no'; });
+        return decidido ? { analytics: v.analytics === 'yes', marketing: v.marketing === 'yes', preferences: v.preferences === 'yes' } : null;
+      }
+      try { return JSON.parse(localStorage.getItem('mn-consentimiento')); } catch (e) { return null; }
+    }
+
+    btn('aceptar').addEventListener('click', function () { guardar({ analytics: true, marketing: true, preferences: true }); });
+    btn('rechazar').addEventListener('click', function () { guardar({ analytics: false, marketing: false, preferences: false }); });
+    btn('configurar').addEventListener('click', function () { mostrarOpciones(true); });
+    btn('guardar').addEventListener('click', function () {
+      guardar({ analytics: opciones.elements.analytics.checked, marketing: opciones.elements.marketing.checked, preferences: opciones.elements.preferences.checked });
+    });
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-mn-cookies-abrir]');
+      if (!t) return;
+      e.preventDefault();
+      marcar(actual() || {});
+      abrir(true);
+    });
+
+    function decidir() {
+      if (document.getElementById('shopify-pc__banner')) return; // banner nativo de Shopify activo
+      var c = actual();
+      if (c) { marcar(c); return; }
+      abrir(false);
+    }
+    if (window.Shopify && window.Shopify.loadFeatures) {
+      window.Shopify.loadFeatures([{ name: 'consent-tracking-api', version: '0.1' }], function (err) {
+        if (!err) api = window.Shopify.customerPrivacy;
+        decidir();
+      });
+    } else {
+      decidir();
+    }
+  })();
+</script>

@@ -13,11 +13,27 @@
         </nav>
       {%- endif -%}
     </div>
+    {%- if s.mostrar_datos -%}
+      {%- comment -%} Datos del negocio: salen de Ajustes > Tienda en Shopify, siempre al día. {%- endcomment -%}
+      <address class="mn-footer__datos">
+        <strong>{{ s.razon_social | default: shop.name }}</strong>
+        {%- if shop.address.address1 != blank -%}
+          <span>{{ shop.address.address1 }}{% if shop.address.address2 != blank %}, {{ shop.address.address2 }}{% endif %}, {{ shop.address.city }}, {{ shop.address.province_code | default: shop.address.province }} {{ shop.address.zip }}, {{ shop.address.country }}</span>
+        {%- endif -%}
+        {%- if shop.email != blank -%}<a href="mailto:{{ shop.email }}">{{ shop.email }}</a>{%- endif -%}
+        {%- if s.mostrar_telefono and shop.phone != blank -%}<a href="tel:{{ shop.phone | remove: ' ' }}">{{ shop.phone }}</a>{%- endif -%}
+      </address>
+    {%- endif -%}
     <div class="mn-footer__fila mn-etiqueta">
       <span>© {{ 'now' | date: '%Y' }} {{ shop.name }}</span>
-      <span class="mn-footer__links">
+      <nav class="mn-footer__legal" aria-label="Legal">
         {%- for policy in shop.policies -%}<a href="{{ policy.url }}">{{ policy.title }}</a>{%- endfor -%}
-      </span>
+        {%- assign pagina_cookies = pages['politica-de-cookies'] -%}
+        {%- if pagina_cookies != blank -%}<a href="{{ pagina_cookies.url }}">{{ pagina_cookies.title }}</a>{%- endif -%}
+        {%- assign opciones = pages['data-sharing-opt-out'] -%}
+        {%- if opciones != blank -%}<a href="{{ opciones.url }}">Tus opciones de privacidad</a>{%- endif -%}
+        <button type="button" class="mn-footer__cookies" data-mn-cookies-abrir>Preferencias de cookies</button>
+      </nav>
     </div>
   </div>
 </div>
@@ -30,6 +46,10 @@
     { "type": "text", "id": "marca", "label": "Nombre grande", "default": "MORENO.co" },
     { "type": "textarea", "id": "frase", "label": "Frase", "default": "Luxury Essentials. Piezas que empiezan en tela desnuda." },
     { "type": "link_list", "id": "menu", "label": "Menú de enlaces", "default": "footer" },
+    { "type": "header", "content": "Datos del negocio" },
+    { "type": "checkbox", "id": "mostrar_datos", "label": "Mostrar nombre, dirección y correo de la tienda", "default": true, "info": "Se toman de Ajustes > Tienda en el admin de Shopify." },
+    { "type": "text", "id": "razon_social", "label": "Nombre legal del negocio (si es distinto)", "info": "Vacío = el nombre de la tienda." },
+    { "type": "checkbox", "id": "mostrar_telefono", "label": "Mostrar el teléfono", "default": true },
     { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
     { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
     { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 },

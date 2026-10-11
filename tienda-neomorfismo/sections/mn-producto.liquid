@@ -135,7 +135,16 @@
         {%- if s.envios != blank -%}
           <details class="mn-acordeon mn-hundido">
             <summary><h2>{{ s.titulo_envios }}</h2></summary>
-            <div class="mn-acordeon__cuerpo"><p>{{ s.envios | newline_to_br }}</p></div>
+            <div class="mn-acordeon__cuerpo">
+              <p>{{ s.envios | newline_to_br }}</p>
+              {%- if shop.shipping_policy != blank or shop.refund_policy != blank -%}
+                <p>
+                  {%- if shop.shipping_policy != blank -%}<a class="mn-link" href="{{ shop.shipping_policy.url }}">{{ shop.shipping_policy.title }}</a>{%- endif -%}
+                  {%- if shop.shipping_policy != blank and shop.refund_policy != blank %} · {% endif -%}
+                  {%- if shop.refund_policy != blank -%}<a class="mn-link" href="{{ shop.refund_policy.url }}">{{ shop.refund_policy.title }}</a>{%- endif -%}
+                </p>
+              {%- endif -%}
+            </div>
           </details>
         {%- endif -%}
       </div>
@@ -148,7 +157,7 @@
   </div>
 </section>
 {%- if s.mostrar_visor -%}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="{{ 'mn-three.min.js' | asset_url }}" defer></script>
   <script src="{{ 'mn-viewer.min.js' | asset_url }}" defer></script>
 {%- endif -%}
 
