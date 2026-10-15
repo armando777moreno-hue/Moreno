@@ -228,6 +228,21 @@
       var visor = sec.querySelector('[data-moreno-360]');
       var barra = sec.querySelector('.mn-barra'), barraPrecio = barra && barra.querySelector('[data-mn-barra-precio]');
       var plantilla = precio && precio.firstChild ? String(precio.firstChild.nodeValue).trim() : '';
+      // Fotos por color: data-mn-grupo es el valor exacto de la opción Color de cada foto ('' = foto común)
+      var galeria = sec.querySelector('[data-mn-color-idx]');
+      var fotos = galeria ? galeria.querySelectorAll('[data-mn-grupo]') : [];
+      function mostrarFotos(v) {
+        if (!fotos.length) return;
+        var g = v.options[parseInt(galeria.dataset.mnColorIdx, 10)];
+        var hay = Array.prototype.some.call(fotos, function (f) { return f.dataset.mnGrupo === g; });
+        var visibles = [];
+        fotos.forEach(function (f) {
+          f.hidden = hay && f.dataset.mnGrupo !== '' && f.dataset.mnGrupo !== g;
+          f.classList.remove('mn-pdp__foto--ancha');
+          if (!f.hidden) visibles.push(f);
+        });
+        if (visibles.length > 1 && visibles.length % 2) visibles[0].classList.add('mn-pdp__foto--ancha');
+      }
       function seleccion() {
         return Array.prototype.map.call(fieldsets, function (fs) {
           var c = fs.querySelector('input:checked'); return c ? c.value : null;
@@ -253,6 +268,7 @@
         var txt = money(v.price, sec, plantilla);
         if (precio) precio.firstChild.nodeValue = txt + ' ';
         if (barraPrecio) barraPrecio.textContent = txt;
+        mostrarFotos(v);
         if (history.replaceState && origen) {
           var u = new URL(location.href); u.searchParams.set('variant', v.id); history.replaceState(null, '', u);
         }

@@ -1,0 +1,35 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "principal": {
+      "type": "mn-producto",
+      "settings": {
+        "nota": "",
+        "nota_fit": "",
+        "max_fotos": 8
+      }
+    },
+    "relacionados": {
+      "type": "mn-bento",
+      "settings": {
+        "collection": "todo",
+        "titulo": "Completa el look.",
+        "etiqueta": "También te puede gustar",
+        "max_productos": 4,
+        "columnas": 3
+      }
+    }
+  },
+  "order": [
+    "principal",
+    "relacionados"
+  ]
+}

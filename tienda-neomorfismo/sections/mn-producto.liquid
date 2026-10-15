@@ -4,6 +4,7 @@
 {%- assign tonos = s.tonos | split: ',' -%}
 {% style %}
   #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
+  #shopify-section-{{ section.id }} .mn-pdp__foto--ancha { grid-column: 1 / -1; }
 {% endstyle %}
 <section class="mn-section" data-mn-producto data-moneda="{{ cart.currency.iso_code }}">
   <div class="mn-container mn-pdp">
@@ -40,12 +41,81 @@
         </div>
       {%- endif -%}
       {%- if product.media.size > 0 -%}
-        <div class="mn-pdp__fotos">
-          {%- for media in product.media limit: s.max_fotos -%}
+        {%- comment -%}
+          Fotos por color: cada foto asignada a una variante abre un grupo con ese color, y las
+          fotos que la siguen pertenecen al mismo grupo hasta la próxima foto asignada. Solo se
+          ve el grupo del color elegido; si ese color no tiene fotos propias, se ven todas.
+        {%- endcomment -%}
+        {%- liquid
+          assign color_idx = -1
+          if s.fotos_por_color
+            for option in product.options_with_values
+              if option.name == 'Color' or option.name == 'Colour'
+                assign color_idx = forloop.index0
+              endif
+            endfor
+          endif
+          assign grupos = '|'
+          assign grupo_actual = ''
+          if color_idx >= 0
+            assign grupo_actual = v_actual.options[color_idx]
+            for media in product.media
+              for v in product.variants
+                if v.featured_media.id == media.id
+                  assign marca = '|' | append: v.options[color_idx] | append: '|'
+                  unless grupos contains marca
+                    assign grupos = grupos | append: v.options[color_idx] | append: '|'
+                  endunless
+                  break
+                endif
+              endfor
+            endfor
+          endif
+          assign marca_actual = '|' | append: grupo_actual | append: '|'
+          assign filtrar = false
+          if grupo_actual != blank and grupos contains marca_actual
+            assign filtrar = true
+          endif
+          assign limite = s.max_fotos
+          if grupos != '|'
+            assign limite = 50
+          endif
+          assign visibles = 0
+          assign grupo = ''
+          for media in product.media limit: limite
+            if color_idx >= 0
+              for v in product.variants
+                if v.featured_media.id == media.id
+                  assign grupo = v.options[color_idx]
+                  break
+                endif
+              endfor
+            endif
+            if media.media_type == 'image'
+              unless filtrar and grupo != blank and grupo != grupo_actual
+                assign visibles = visibles | plus: 1
+              endunless
+            endif
+          endfor
+          assign impar = visibles | modulo: 2
+        -%}
+        <div class="mn-pdp__fotos"{% if color_idx >= 0 and grupos != '|' %} data-mn-color-idx="{{ color_idx }}"{% endif %}>
+          {%- assign grupo = '' -%}
+          {%- assign mostradas = 0 -%}
+          {%- for media in product.media limit: limite -%}
+            {%- if color_idx >= 0 -%}
+              {%- for v in product.variants -%}
+                {%- if v.featured_media.id == media.id -%}{%- assign grupo = v.options[color_idx] -%}{%- break -%}{%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
             {%- if media.media_type == 'image' -%}
-              <figure class="mn-pdp__foto mn-relieve mn-reveal" data-delay="{{ forloop.index | modulo: 4 }}">
+              {%- assign oculta = false -%}
+              {%- if filtrar and grupo != blank and grupo != grupo_actual -%}{%- assign oculta = true -%}{%- endif -%}
+              {%- unless oculta -%}{%- assign mostradas = mostradas | plus: 1 -%}{%- endunless -%}
+              <figure class="mn-pdp__foto mn-relieve mn-reveal{% if mostradas == 1 and oculta == false and impar == 1 and visibles > 1 %} mn-pdp__foto--ancha{% endif %}" data-delay="{{ forloop.index | modulo: 4 }}"
+                {%- if color_idx >= 0 and grupos != '|' %} data-mn-grupo="{{ grupo | escape }}"{% endif %}{% if oculta %} hidden{% endif %}>
                 <img src="{{ media | image_url: width: 1100 }}" alt="{{ media.alt | default: product.title | escape }}"
-                  {% if forloop.first and s.mostrar_visor == false %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                  {% if mostradas == 1 and oculta == false and s.mostrar_visor == false %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
                   width="{{ media.preview_image.width }}" height="{{ media.preview_image.height }}">
               </figure>
             {%- endif -%}
@@ -169,6 +239,7 @@
     { "type": "text", "id": "etiqueta", "label": "Etiqueta pequeña", "default": "MORENO.co" },
     { "type": "checkbox", "id": "mostrar_visor", "label": "Mostrar la prenda en 3D (solo prendas con fotos 3D)", "default": false },
     { "type": "range", "id": "max_fotos", "label": "Fotos máximas en la galería", "min": 1, "max": 20, "step": 1, "default": 6 },
+    { "type": "checkbox", "id": "fotos_por_color", "label": "Mostrar solo las fotos del color elegido", "default": true, "info": "Asigna a cada color su foto principal (Productos > variante > imagen). Las fotos que la siguen en la galería se muestran con ese color." },
     { "type": "textarea", "id": "tonos", "label": "Colores (clave:#color, separados por comas)", "default": "onyx:#323338, ink:#111015, bone:#dfe1f2, stone:#7b7b7d, ash:#95969a, sand:#dbd0c3, espresso:#937663, oxblood:#d51625, midnight:#171b30, dusty-rose:#f689b4, rose:#dc84a6, olive:#6b6a45, cream:#efe6d4, black:#1b1a19" },
     { "type": "header", "content": "Compra" },
     { "type": "text", "id": "etiqueta_talla", "label": "Nombre de la opción de talla", "default": "Talla" },

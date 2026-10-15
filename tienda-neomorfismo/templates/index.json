@@ -102,10 +102,10 @@
     "mosaico": {
       "type": "mn-bento",
       "settings": {
-        "collection": "todo",
-        "etiqueta": "La colección",
+        "collection": "esenciales",
+        "etiqueta": "Esenciales",
         "titulo": "Piezas para llevar puestas.",
-        "texto_boton": "Ver todo",
+        "texto_boton": "Ver esenciales",
         "max_productos": 6,
         "columnas": 3,
         "columnas_movil": "2",
@@ -114,7 +114,7 @@
         "hover_segunda_foto": true,
         "color_fondo": "#e9e4dc",
         "color_texto": "#3a332c",
-        "padding_top": 80,
+        "padding_top": 48,
         "padding_bottom": 96
       }
     },
@@ -215,12 +215,32 @@
         "padding_top": 96,
         "padding_bottom": 120
       }
+    },
+    "drop": {
+      "type": "mn-bento",
+      "settings": {
+        "collection": "drop-001",
+        "etiqueta": "Drop 001 — Refranes",
+        "titulo": "Refranes, dibujados a mano.",
+        "texto_boton": "Ver el drop",
+        "max_productos": 3,
+        "columnas": 3,
+        "columnas_movil": "2",
+        "numerar": true,
+        "mostrar_tallas": false,
+        "hover_segunda_foto": true,
+        "color_fondo": "#e9e4dc",
+        "color_texto": "#3a332c",
+        "padding_top": 80,
+        "padding_bottom": 48
+      }
     }
   },
   "order": [
     "apertura",
     "banda",
     "rueda",
+    "drop",
     "mosaico",
     "manifiesto",
     "detalles",
