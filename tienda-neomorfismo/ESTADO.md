@@ -1,5 +1,45 @@
 # MORENO.co — Neomorfismo · Estado
 
+## 15/10 — "MORENO CO. — Arte 360° · Neomorfismo" (el tema que sustituye a Arte 360°)
+
+Tema **sin publicar** id `189241491701`: copia de Neomorfismo con los cambios de abajo. El tema publicado
+"MORENO CO. — Arte 360° (borrador)" (id `188804563189`) no se puede escribir por la API, así que la conversión
+se hizo en esta copia. Al publicarla, Arte 360° queda como respaldo.
+
+- Vista previa: https://autods-user-store-52230-g0uyjwy5.myshopify.com/?preview_theme_id=189241491701
+- Editor: https://admin.shopify.com/store/autods-user-store-52230-g0uyjwy5/themes/189241491701/editor
+
+Hecho:
+
+- **Mockups del Drop 001** (`mockups/drop-001/`, 18 fotos 2000×2500): espalda, frente y detalle de Perro Que Ladra,
+  Ojo Por Ojo y Cría Cuervos en negra y crema. Salen del arte recortado de las fotos planas
+  (`tools/extract_drop_art.py` → `assets/img/drop-001/`, `tools/build_mockups.py`). Subidas a cada producto y la
+  espalda de cada color asignada a sus 6 tallas.
+- **Fotos por color** en `mn-producto` (ajuste "Mostrar solo las fotos del color elegido"): la foto asignada a una
+  variante abre el grupo de ese color y las siguientes le pertenecen. Lienzo lo tiene apagado.
+- `templates/product.json` usa `mn-producto`: la sudadera y los jerseys de Collective tienen la página neomórfica.
+- Portada: mosaico nuevo de Drop 001 y el mosaico existente muestra Esenciales. Anuncio en español con enlace al drop.
+- `config/settings_data.json`: paleta arena/tinta, para que cabecera, carrito, contacto, búsqueda y 404 no salgan en blanco.
+- Catálogo: Drop 001 y Esenciales **publicadas** (el menú llevaba a 404). Sudadera y jerseys en Todo y en Esenciales
+  (etiqueta `essentials`). Todo ordenado a mano: Drop 001, Lienzo, sudadera, jerseys.
+- Menús, páginas (Contacto, El Taller, Cuidado y tallas), descripciones y SEO de las 4 piezas propias y de 2 colecciones en español.
+
+Pendiente (lo haces tú):
+
+1. **Publicar** "MORENO CO. — Arte 360° · Neomorfismo" (la API no publica temas). La tienda **no tiene contraseña**: el cambio se ve al instante.
+2. **Políticas**: solo existe la de privacidad automática en inglés. Pega `legal/reembolsos.html`, `terminos.html`,
+   `envios.html` y `contacto.html` en Ajustes → Políticas (la conexión no puede escribirlas). Revisa las ⚠️ de `LEGAL.md`.
+3. **Producción del Drop 001**: está "hecho a pedido" pero no hay app de impresión conectada (solo AutoDS, Collective y
+   AliExpress). Conecta Printful o Printify y sube el arte en alta resolución: el recortado aquí mide ~480 px, no sirve para imprimir.
+4. **Idioma**: el idioma principal es inglés, así que carrito, pago, búsqueda y correos salen en inglés. Ajustes → Idiomas.
+5. **Pagos**: la conexión no puede leerlos. Revisa Ajustes → Pagos.
+6. **Dominio**: `moreno.co` no está disponible; la tienda usa el dominio myshopify.
+7. CAMISETA ALGODON sigue fuera de las colecciones: su descripción es "..." y no tiene tallas. Complétala o archívala.
+8. La sudadera de Collective solo tiene una variante (A02-green / Large).
+9. Logo, favicon e imagen para redes sin configurar; descripción de la tienda (meta de la portada) vacía en Preferencias.
+
+---
+
 Tema **sin publicar** "MORENO.co — Neomorfismo" (id `188811837685`) en `autods-user-store-52230-g0uyjwy5`.
 Es un duplicado de Horizon: se reemplazaron el inicio, la página de producto, la colección y el pie con secciones propias `mn-`.
 

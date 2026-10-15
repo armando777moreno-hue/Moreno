@@ -68,6 +68,9 @@ The product sold on the site is **Lienzo — Acid Wash Oversized Tee** (handle `
     - `URL` bodies pointing to Shopify Files get re-encoded, and text from there silently fails.
     - The Admin API can't write to the live (MAIN) theme.
 - `tienda-neomorfismo/` is a second, complete Shopify theme layer in a neumorphism style: the **unpublished** theme "MORENO.co — Neomorfismo" (id 188811837685), a Horizon duplicate whose home, product, collection and footer are replaced by custom `mn-` sections. `ESTADO.md` there lists every file and what is still pending.
+  - The working copy that replaces the live "Arte 360°" theme is **"MORENO CO. — Arte 360° · Neomorfismo"** (id 189241491701, unpublished until the merchant publishes it). Upload theme changes there, not to 188811837685.
+  - `mockups/drop-001/` are the Drop 001 product photos (`tools/build_mockups.py` from the art cut out by `tools/extract_drop_art.py`). Each colour's back view is the featured media of that colour's variants; `mn-producto` groups the gallery by colour from those assignments (setting `fotos_por_color`, off for Lienzo).
+  - `settings_data.json` is stored by Shopify as compact JSON: after an upload, compare `checksumMd5` against the compact serialization, not the pretty file.
   - Everything is prefixed `mn-`. `assets/mn-styles.css` holds the tokens (`--mn-fondo` #E9E4DC sand, raised/inset dual shadows, `--mn-acento` sunset orange). `assets/mn-scripts.js` is one guarded IIFE that re-inits on `shopify:section:load`.
   - Scroll effects run in one rAF loop: `track(el, fn)` gets `p` (-1 below … 1 above the viewport center) only while the element is near the screen. `[data-mn-3d]` gets `--mn-p` for CSS 3D tilt. `[data-mn-hero]`, `[data-mn-parallax]`, `[data-mn-cierre]` and the word-by-word `.mn-frase` have their own handlers.
   - The hero uses the same viewer with `data-scroll="<turns>"`, which turns the garment with scroll progress, starting from the front wherever it sits on load.
