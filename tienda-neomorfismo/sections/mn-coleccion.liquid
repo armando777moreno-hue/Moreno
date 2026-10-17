@@ -3,6 +3,21 @@
 {% style %}
   #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
 {% endstyle %}
+{% stylesheet %}
+  /* Apartado por distribuidor: misma tarjeta y mismo fondo; solo una cabecera en relieve suave
+     y una línea hundida que separa, para que el cambio de proveedor no sea brusco. */
+  .mn-apartado + .mn-apartado { margin-top: clamp(48px, 7vw, 96px); }
+  .mn-apartado__head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 6px 24px;
+    padding-bottom: clamp(16px, 2vw, 22px); margin-bottom: clamp(20px, 3vw, 36px);
+    box-shadow: 0 1px 0 var(--mn-luz, rgba(255, 255, 255, .85)), 0 -1px 0 inset var(--mn-sombra, rgba(170, 158, 140, .55)); }
+  .mn-apartado__head > .mn-etiqueta:first-child { grid-column: 1 / -1; }
+  .mn-apartado__titulo { margin: 0; font: 600 clamp(28px, 4vw, 52px) / 1.05 var(--mn-marca, 'Cormorant Garamond', Georgia, serif); letter-spacing: -.01em; min-width: 0; overflow-wrap: anywhere; }
+  .mn-apartado__meta { text-align: end; white-space: nowrap; }
+  @media (max-width: 560px) {
+    .mn-apartado__head { grid-template-columns: 1fr; }
+    .mn-apartado__meta { text-align: start; white-space: normal; }
+  }
+{% endstylesheet %}
 <section class="mn-section mn-escena">
   <div class="mn-container">
     <header class="mn-col-head mn-hundido mn-reveal" style="margin-bottom: clamp(32px, 5vw, 64px);">
@@ -15,6 +30,66 @@
       {%- endif -%}
     </header>
     {%- paginate collection.products by s.por_pagina -%}
+      {%- comment -%}
+        Apartados por distribuidor: cuando la página reúne prendas de varios proveedores, cada uno
+        tiene su apartado con una cabecera suave, en el orden en que aparecen en la colección.
+        El nombre visible sale de la tabla "proveedor | nombre" de los ajustes.
+      {%- endcomment -%}
+      {%- liquid
+        assign proveedores = '|'
+        for product in collection.products
+          assign marca = '|' | append: product.vendor | append: '|'
+          unless proveedores contains marca
+            assign proveedores = proveedores | append: product.vendor | append: '|'
+          endunless
+        endfor
+        assign lista = proveedores | split: '|'
+        assign total_proveedores = 0
+        for v in lista
+          if v != blank
+            assign total_proveedores = total_proveedores | plus: 1
+          endif
+        endfor
+        assign agrupar = false
+        if s.agrupar_por_proveedor and total_proveedores > 1
+          assign agrupar = true
+        endif
+        assign nombres = s.nombres_proveedor | newline_to_br | split: '<br />'
+      -%}
+      {%- if agrupar -%}
+        {%- assign n = 0 -%}
+        {%- assign ap = 0 -%}
+        {%- for v in lista -%}
+          {%- if v == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign ap = ap | plus: 1 -%}
+          {%- assign visible = v -%}
+          {%- assign de_la_casa = false -%}
+          {%- for linea in nombres -%}
+            {%- assign par = linea | split: '|' -%}
+            {%- assign clave = par[0] | strip -%}
+            {%- if clave == v and par.size > 1 -%}{%- assign visible = par[1] | strip -%}{%- endif -%}
+          {%- endfor -%}
+          {%- if v contains 'MORENO' -%}{%- assign de_la_casa = true -%}{%- endif -%}
+          {%- assign del_proveedor = collection.products | where: 'vendor', v -%}
+          <section class="mn-apartado" aria-labelledby="mn-ap-{{ section.id }}-{{ ap }}">
+            <header class="mn-apartado__head mn-reveal">
+              <p class="mn-etiqueta">{{ s.texto_apartado }} {{ ap | prepend: '0' | slice: -2, 2 }}</p>
+              <h2 class="mn-apartado__titulo" id="mn-ap-{{ section.id }}-{{ ap }}">{{ visible }}</h2>
+              <p class="mn-etiqueta mn-apartado__meta">
+                {{- del_proveedor.size }} {% if del_proveedor.size == 1 %}{{ s.texto_pieza }}{% else %}{{ s.texto_piezas }}{% endif -%}
+                {%- unless de_la_casa or s.texto_seleccion == blank %} · {{ s.texto_seleccion }}{% endunless -%}
+              </p>
+            </header>
+            <div class="mn-bento mn-bento--plano" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
+              {%- for product in del_proveedor -%}
+                {%- assign n = n | plus: 1 -%}
+                {%- assign d = n | modulo: 6 -%}
+                {%- render 'mn-tarjeta', product: product, indice: n, numerar: s.numerar, mostrar_tallas: s.mostrar_tallas, hover: true, delay: d -%}
+              {%- endfor -%}
+            </div>
+          </section>
+        {%- endfor -%}
+      {%- else -%}
       <h2 class="mn-sr">{{ s.texto_piezas | capitalize }}</h2>
       <div class="mn-bento mn-bento--plano" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
         {%- for product in collection.products -%}
@@ -24,6 +99,7 @@
           <p class="mn-lead">{{ s.texto_vacio }}</p>
         {%- endfor -%}
       </div>
+      {%- endif -%}
       {%- if paginate.pages > 1 -%}
         <nav class="mn-footer__links" style="justify-content: center; margin-top: 48px;" aria-label="Páginas">
           {%- if paginate.previous -%}<a class="mn-btn" href="{{ paginate.previous.url }}">← Anterior</a>{%- endif -%}
@@ -48,6 +124,11 @@
     { "type": "select", "id": "columnas_movil", "label": "Columnas en móvil", "options": [{ "value": "1", "label": "1" }, { "value": "2", "label": "2" }], "default": "2" },
     { "type": "checkbox", "id": "numerar", "label": "Numerar las prendas", "default": true },
     { "type": "checkbox", "id": "mostrar_tallas", "label": "Mostrar las tallas", "default": true },
+    { "type": "header", "content": "Apartados por distribuidor" },
+    { "type": "checkbox", "id": "agrupar_por_proveedor", "label": "Separar las prendas por distribuidor", "default": true, "info": "Solo se separan cuando la página tiene prendas de más de un distribuidor." },
+    { "type": "text", "id": "texto_apartado", "label": "Palabra antes del número", "default": "Apartado" },
+    { "type": "text", "id": "texto_seleccion", "label": "Nota para prendas de otros distribuidores", "default": "Selección de MORENO.co" },
+    { "type": "textarea", "id": "nombres_proveedor", "label": "Nombre visible de cada distribuidor", "info": "Una línea por distribuidor: nombre del proveedor en Shopify | nombre que ve el cliente.", "default": "MORENO CO. | MORENO.co · De la casa\nMORENO.co | MORENO.co · De la casa\nI-Max Fashions | Lacoste\nrubbersoled | Cole Haan\nBanlieue91 | Tod's\nC&E Fashions | C Collection\nWessi - Discover Diversity | Wessi\nDevereux | Devereux\nIvy + Cloth | Ivy + Cloth\nLOOPBACK APPAREL | Loopback\nLoran | Loran\nEasyOptionXY | Sudaderas lavadas\nnowadaysfashion | Joyería" },
     { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#E9E4DC" },
     { "type": "color", "id": "color_texto", "label": "Texto", "default": "#3A332C" },
     { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
