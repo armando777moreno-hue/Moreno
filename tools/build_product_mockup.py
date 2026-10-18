@@ -196,6 +196,11 @@ def studio(im, bands=False):
         s = W / w
     else:
         s = min(W * 0.8 / (np.ptp(xs) + 1), H * 0.82 / (np.ptp(ys) + 1))
+    # cut on two opposite edges: the frame must span that whole dimension too, or one cut floats in the sand
+    if t['left'] and t['right']:
+        s = max(s, W / w)
+    if t['top'] and t['bottom']:
+        s = max(s, H / h)
     nw, nh = round(w * s), round(h * s)
     x0 = 0 if t['left'] else W - nw if t['right'] else round(W / 2 - (xs.min() + xs.max()) / 2 * s)
     y0 = 0 if t['top'] else H - nh if t['bottom'] else round(H * 0.47 - (ys.min() + ys.max()) / 2 * s)
