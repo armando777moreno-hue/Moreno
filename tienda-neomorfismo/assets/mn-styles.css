@@ -184,9 +184,15 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   .mn-bento > .mn-card--ancha-m { grid-column: 1 / -1; }
   .mn-card--ancha-m .mn-card__media { aspect-ratio: 16 / 10; }
 }
-/* Los huecos estirados (última tarjeta del mosaico) no son 4:5: ahí el mockup vuelve a ir con margen */
-.mn-card--ancha .mn-card__img--lleno { padding: 8%; object-fit: contain; }
+/* Los huecos estirados (última tarjeta del mosaico, y la primera 2x2 en ordenador) no son 4:5: ahí el mockup
+   vuelve a ir con margen. El margen se limita porque el 8% se calcula sobre el ancho, que en un hueco apaisado es enorme. */
+.mn-card--ancha .mn-card__img, .mn-card--ancha .mn-card__img--lleno { padding: min(8%, 24px); }
+.mn-card--ancha .mn-card__img--lleno { object-fit: contain; }
 .mn-card--ancha .mn-card__media--lleno::after { content: none; }
+@media (min-width: 990px) {
+  .mn-bento:not(.mn-bento--plano) > .mn-card:first-child .mn-card__img--lleno { padding: 8%; object-fit: contain; }
+  .mn-bento:not(.mn-bento--plano) > .mn-card:first-child .mn-card__media--lleno::after { content: none; }
+}
 @media (max-width: 989px) {
   .mn-card--ancha:not(.mn-card--ancha-m) .mn-card__img--lleno { padding: 0; object-fit: cover; }
   .mn-card--ancha:not(.mn-card--ancha-m) .mn-card__media--lleno::after { content: ''; }
@@ -196,7 +202,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 @media (max-width: 560px) {
   .mn-card { padding: 10px; }
   .mn-card__info { flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px 6px 4px; }
-  .mn-card__title { font-size: 15px; }
+  .mn-card__title { flex: none; font-size: 15px; }
   .mn-card__price { font-size: 13px; }
   .mn-card__frase { padding: 10%; font-size: 20px; }
 }
@@ -295,6 +301,7 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-barra__nombre { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mn-barra__info > span { flex: none; }
 .mn-barra .mn-btn { flex: none; white-space: nowrap; }
+@media (max-width: 374px) { .mn-barra__nombre, .mn-barra__info > span:first-of-type { display: none; } }
 @media (max-width: 989px) {
   .mn-pdp { grid-template-columns: 1fr; }
   .mn-pdp__compra { position: static; }
