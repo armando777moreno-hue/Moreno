@@ -98,11 +98,13 @@ def compose(rgba, fill=0.78, seed=7, contact=False):
 
 
 def matte(im):
-    """Studio matte: (foreground colours with the backdrop removed from soft edges, alpha 0..1)."""
+    """Studio matte: (foreground colours with the backdrop taken out of soft edges, alpha 0..1)."""
     from rembg import remove, new_session
-    a = np.maximum(*(np.asarray(remove(im, session=new_session(m), only_mask=True), float) / 255
-                     for m in ('u2net_human_seg', 'isnet-general-use')))
+    a_net = np.maximum(*(np.asarray(remove(im, session=new_session(m), only_mask=True), float) / 255
+                         for m in ('u2net_human_seg', 'isnet-general-use')))
     rgb = np.asarray(im, float)
+    h, w = a_net.shape
+    band = max(4, round(max(h, w) * 0.012))                 # outline band, where JPEG fringes and light-wrap live
     border = np.concatenate([rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]])
     # backdrop = the light cluster on the frame edge (in close-ups most of the edge is the product itself)
     lum = border.mean(1)
@@ -110,27 +112,57 @@ def matte(im):
     d = np.abs(border - bgc).max(1)
     frac = (d < 30).mean()
     noise = np.percentile(d[d < 30], 95) if frac > 0 else 99
-    if frac > 0.05 and noise < 18 and bgc.mean() > 170:
-        # plain backdrop: colour key = connected to the frame and close to the backdrop colour.
-        # A clean white backdrop gets a tight key, so pale garments (a light blue polo) survive.
-        tol = float(np.clip(noise * 2 + 4, 6, 22))
-        lab, _ = ndimage.label(np.abs(rgb - bgc).max(2) < tol)
-        edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
-        bgmask = np.isin(lab, edge[edge > 0])
-        key = 1 - ndimage.gaussian_filter(bgmask.astype(float), 1.2)
-        # the key fills what the nets half-erase inside the subject; along the outline (where the JPEG
-        # fringe lives) the nets decide
-        inside = ndimage.binary_erosion(~bgmask, iterations=max(4, round(max(a.shape) * 0.012)))
-        a = np.where(inside, np.maximum(a, key), np.minimum(a, key))
+    plain = frac > 0.05 and noise < 18 and bgc.mean() > 170
+    tol = float(np.clip(noise * 2 + 4, 6, 22))
+    # backdrop colour per pixel. A plain sweep is bgc everywhere; a wall has gradients and shadows, so there
+    # it is what the nets are sure is background, spread under the subject by a normalised blur
+    sure = (a_net < 0.05).astype(float)
+    if plain or not sure.any():
+        B = np.broadcast_to(bgc, rgb.shape)
+    else:
+        sig = max(h, w) * 0.03
+        den = ndimage.gaussian_filter(sure, sig)[..., None]
+        num = np.stack([ndimage.gaussian_filter(rgb[..., c] * sure, sig) for c in range(3)], -1)
+        B = np.where(den > 1e-3, num / np.maximum(den, 1e-3), bgc)
+    diff = np.abs(rgb - B).max(2)
+    if not plain:
+        tol = float(np.clip(np.percentile(diff[sure > 0], 90) * 2 + 4, 6, 22)) if sure.any() else 22.0
+    near = diff < tol
+    lab, n = ndimage.label(near)
+    edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
+    bgmask = np.isin(lab, edge[edge > 0]) if plain else np.zeros_like(near)
+    # flat backdrop pockets closed in by the figure (between an arm and the torso, inside a hand, a bag-strap
+    # loop): same colour as the backdrop and no texture. Garments have texture, so they are not taken.
+    if n:
+        ids = np.arange(1, n + 1)
+        size = ndimage.sum(np.ones_like(diff), lab, ids)
+        flat = ndimage.standard_deviation(rgb.mean(2), lab, ids) < 3
+        close = ndimage.mean(diff, lab, ids) < tol * 0.6
+        pockets = ids[(size >= h * w * 0.0003) & flat & close & ~np.isin(ids, edge)]
+        bgmask = bgmask | np.isin(lab, pockets)
+    if plain:
+        # plain sweep: a colour key beats the nets. Inside the subject it is opaque (fills what the nets
+        # half-erase, a pale polo on white); along the outline alpha follows the distance from the backdrop
+        # colour, so white rims, shaded white gaps and ghosted fingers resolve by colour.
+        # border_value=1: the frame edge is not an outline, a garment cut by the frame stays opaque there.
+        inside = ndimage.binary_erosion(~bgmask, iterations=band, border_value=1)
+        a = np.where(inside, 1.0, np.clip((diff - 0.5 * tol) / (4.5 * tol), 0, 1))
+    else:
+        # wall or room: the nets decide, pockets go, and along the outline pixels close to the local
+        # backdrop colour fade out (wall light-wrap)
+        a = np.where(bgmask, 0, a_net)
+        solid = a > 0.5
+        outline = ndimage.binary_dilation(solid, iterations=band) & ~ndimage.binary_erosion(solid, iterations=band, border_value=1)
+        a = np.where(outline, np.minimum(a, np.clip((diff - 0.5 * tol) / (2.5 * tol), 0, 1)), a)
     a = np.clip(a, 0, 1)
     # loose fragments away from the figure (floor reflections, wall specks) are dropped
     lab, n = ndimage.label(a > 0.5)
     if n > 1:
         sizes = ndimage.sum(np.ones_like(a), lab, range(1, n + 1))
         a = a * ndimage.binary_dilation(np.isin(lab, 1 + np.flatnonzero(sizes >= sizes.max() * 0.02)), iterations=4)
-    # take the backdrop colour out of semi-transparent edge pixels (no white halo on sand)
+    # take the backdrop colour out of semi-transparent edge pixels (no halo on sand)
     aa = np.maximum(a, 0.08)[..., None]
-    fg = np.where(a[..., None] > 0.97, rgb, np.clip((rgb - (1 - aa) * bgc) / aa, 0, 255))
+    fg = np.where(a[..., None] > 0.97, rgb, np.clip((rgb - (1 - aa) * B) / aa, 0, 255))
     return fg, a
 
 

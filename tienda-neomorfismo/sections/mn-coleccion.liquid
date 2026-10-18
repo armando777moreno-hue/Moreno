@@ -9,9 +9,10 @@
      que las tarjetas: uno de 1 o 2 piezas ocupa solo esas columnas y deja sitio al siguiente al lado.
      Cada apartado es una subrejilla de 2 filas (cabecera, tarjetas), así las tarjetas de una misma fila
      empiezan a la misma altura aunque una cabecera ocupe más líneas. */
-  .mn-apartados { --gap: clamp(18px, 2.4vw, 32px); display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); column-gap: var(--gap); }
+  /* --sep separa filas de apartados; el margen negativo quita el de la última fila (el espacio final lo pone la sección) */
+  .mn-apartados { --gap: clamp(18px, 2.4vw, 32px); --sep: clamp(48px, 7vw, 96px); display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); column-gap: var(--gap); margin-bottom: calc(-1 * var(--sep)); }
   .mn-apartado { grid-column: span var(--ap, 1); grid-row: span 2; display: grid; grid-template-rows: subgrid; row-gap: 0;
-    min-width: 0; padding-bottom: clamp(48px, 7vw, 96px); }
+    min-width: 0; padding-bottom: var(--sep); }
   .mn-apartado .mn-bento { gap: var(--gap); }
   .mn-apartado__head { display: grid; grid-template-columns: 1fr auto; align-content: end; align-items: end; gap: 6px 24px;
     padding-bottom: clamp(16px, 2vw, 22px); margin-bottom: clamp(20px, 3vw, 36px);

@@ -60,8 +60,8 @@
   </a>
   <div class="mn-card__info">
     <h3 class="mn-card__title">
-      {%- if marca != blank -%}<span class="mn-card__marca mn-etiqueta">{{ marca }}</span>{%- endif -%}
-      <a href="{{ product.url }}">{{ titulo }}</a>
+      {%- if marca != blank -%}<span class="mn-card__marca mn-etiqueta">{{ marca | escape }}</span>{%- endif -%}
+      <a href="{{ product.url }}">{{ titulo | escape | replace: '/', '/<wbr>' }}</a>
     </h3>
     <p class="mn-card__price">
       {%- if product.price_varies -%}desde {% endif -%}{{ product.price_min | money }}

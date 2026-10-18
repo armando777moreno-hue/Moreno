@@ -231,7 +231,7 @@
         endunless
       endif
     -%}
-    <span><strong>{{ corto }}</strong> ·<span data-mn-barra-precio>{{ v_actual.price | money }}</span></span>
+    <span class="mn-barra__info"><strong class="mn-barra__nombre">{{ corto }}</strong><span>·</span><span data-mn-barra-precio>{{ v_actual.price | money }}</span></span>
     <button type="button" class="mn-btn mn-btn--acento" tabindex="-1">{{ s.boton_texto }}</button>
   </div>
 </section>

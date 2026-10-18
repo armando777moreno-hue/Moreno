@@ -159,8 +159,8 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   font: italic 500 clamp(22px, 2.4vw, 34px)/1.15 var(--mn-marca); color: var(--mn-tinta); }
 .mn-card__num { position: absolute; top: 16px; left: 18px; }
 .mn-card__badge { position: absolute; top: 14px; right: 14px; padding: 7px 12px; border-radius: 999px; font: 500 11px/1 var(--mn-mono); letter-spacing: .1em; }
-.mn-card__info { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 18px 8px 6px; }
-.mn-card__title { font: 700 17px/1.25 var(--mn-cuerpo); letter-spacing: -.01em; min-width: 0; overflow-wrap: anywhere; }
+.mn-card__info { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; padding: 18px 8px 6px; }
+.mn-card__title { flex: 1 1 12ch; min-width: min(100%, 12ch); font: 700 17px/1.25 var(--mn-cuerpo); letter-spacing: -.01em; overflow-wrap: break-word; }
 .mn-card__marca { display: block; margin-bottom: 5px; font-size: 11px; font-weight: 500; }
 .mn-card__price { font: 500 15px/1 var(--mn-mono); white-space: nowrap; }
 .mn-card__tallas { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 8px; }
@@ -183,6 +183,15 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
   .mn-card--ancha .mn-card__media { aspect-ratio: var(--mn-ratio, 4 / 5); flex: none; min-height: 0; }
   .mn-bento > .mn-card--ancha-m { grid-column: 1 / -1; }
   .mn-card--ancha-m .mn-card__media { aspect-ratio: 16 / 10; }
+}
+/* Los huecos estirados (última tarjeta del mosaico) no son 4:5: ahí el mockup vuelve a ir con margen */
+.mn-card--ancha .mn-card__img--lleno { padding: 8%; object-fit: contain; }
+.mn-card--ancha .mn-card__media--lleno::after { content: none; }
+@media (max-width: 989px) {
+  .mn-card--ancha:not(.mn-card--ancha-m) .mn-card__img--lleno { padding: 0; object-fit: cover; }
+  .mn-card--ancha:not(.mn-card--ancha-m) .mn-card__media--lleno::after { content: ''; }
+  .mn-card--ancha-m .mn-card__img--lleno { padding: 8%; object-fit: contain; }
+  .mn-card--ancha-m .mn-card__media--lleno::after { content: none; }
 }
 @media (max-width: 560px) {
   .mn-card { padding: 10px; }
@@ -281,6 +290,11 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-barra { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; display: none; align-items: center; justify-content: space-between; gap: 12px;
   padding: 10px 10px 10px 20px; border-radius: 999px; transform: translateY(140%); transition: transform .45s var(--mn-ease); }
 .mn-barra.is-visible { transform: none; }
+/* Nombre en una línea con puntos suspensivos; el precio y el botón no se encogen */
+.mn-barra__info { display: flex; align-items: baseline; gap: .4em; min-width: 0; }
+.mn-barra__nombre { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mn-barra__info > span { flex: none; }
+.mn-barra .mn-btn { flex: none; white-space: nowrap; }
 @media (max-width: 989px) {
   .mn-pdp { grid-template-columns: 1fr; }
   .mn-pdp__compra { position: static; }
