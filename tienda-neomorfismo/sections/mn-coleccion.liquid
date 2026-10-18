@@ -4,15 +4,32 @@
   #shopify-section-{{ section.id }} { padding-top: {{ s.padding_top }}px; padding-bottom: {{ s.padding_bottom }}px; background-color: {{ s.color_fondo }}; color: {{ s.color_texto }}; }
 {% endstyle %}
 {% stylesheet %}
-  /* Apartado por distribuidor: misma tarjeta y mismo fondo; solo una cabecera en relieve suave
-     y una línea hundida que separa, para que el cambio de proveedor no sea brusco. */
-  .mn-apartado + .mn-apartado { margin-top: clamp(48px, 7vw, 96px); }
-  .mn-apartado__head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 6px 24px;
+  /* Apartado por distribuidor: misma tarjeta y mismo fondo; solo una cabecera suave y una línea hundida
+     que separa, para que el cambio de proveedor no sea brusco. Los apartados fluyen en la misma rejilla
+     que las tarjetas: uno de 1 o 2 piezas ocupa solo esas columnas y deja sitio al siguiente al lado.
+     Cada apartado es una subrejilla de 2 filas (cabecera, tarjetas), así las tarjetas de una misma fila
+     empiezan a la misma altura aunque una cabecera ocupe más líneas. */
+  .mn-apartados { --gap: clamp(18px, 2.4vw, 32px); display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); column-gap: var(--gap); }
+  .mn-apartado { grid-column: span var(--ap, 1); grid-row: span 2; display: grid; grid-template-rows: subgrid; row-gap: 0;
+    min-width: 0; padding-bottom: clamp(48px, 7vw, 96px); }
+  .mn-apartado .mn-bento { gap: var(--gap); }
+  .mn-apartado__head { display: grid; grid-template-columns: 1fr auto; align-content: end; align-items: end; gap: 6px 24px;
     padding-bottom: clamp(16px, 2vw, 22px); margin-bottom: clamp(20px, 3vw, 36px);
     box-shadow: 0 1px 0 var(--mn-luz, rgba(255, 255, 255, .85)), 0 -1px 0 inset var(--mn-sombra, rgba(170, 158, 140, .55)); }
   .mn-apartado__head > .mn-etiqueta:first-child { grid-column: 1 / -1; }
-  .mn-apartado__titulo { margin: 0; font: 600 clamp(28px, 4vw, 52px) / 1.05 var(--mn-marca, 'Cormorant Garamond', Georgia, serif); letter-spacing: -.01em; min-width: 0; overflow-wrap: anywhere; }
+  .mn-apartado__titulo { margin: 0; font: 600 clamp(28px, 4vw, 52px) / 1.05 var(--mn-marca, 'Cormorant Garamond', Georgia, serif); letter-spacing: -.01em; min-width: 0; overflow-wrap: break-word; hyphens: auto; }
   .mn-apartado__meta { text-align: end; white-space: nowrap; }
+  /* Apartado de una columna: cabecera apilada y título algo menor */
+  .mn-apartado--1 .mn-apartado__head { grid-template-columns: 1fr; }
+  .mn-apartado--1 .mn-apartado__titulo { font-size: clamp(26px, 2.6vw, 38px); }
+  .mn-apartado--1 .mn-apartado__meta { text-align: start; white-space: normal; }
+  @media (max-width: 989px) {
+    .mn-apartados { grid-template-columns: repeat(var(--cols-m, 2), minmax(0, 1fr)); }
+    .mn-apartado { grid-column: span var(--ap-m, 1); }
+    .mn-apartado--m1 .mn-apartado__head { grid-template-columns: 1fr; }
+    .mn-apartado--m1 .mn-apartado__titulo { font-size: clamp(22px, 4.6vw, 30px); }
+    .mn-apartado--m1 .mn-apartado__meta { text-align: start; white-space: normal; }
+  }
   @media (max-width: 560px) {
     .mn-apartado__head { grid-template-columns: 1fr; }
     .mn-apartado__meta { text-align: start; white-space: normal; }
@@ -59,6 +76,9 @@
       {%- if agrupar -%}
         {%- assign n = 0 -%}
         {%- assign ap = 0 -%}
+        {%- assign cols = s.columnas | plus: 0 -%}
+        {%- assign cols_m = s.columnas_movil | plus: 0 -%}
+        <div class="mn-apartados" style="--cols: {{ cols }}; --cols-m: {{ cols_m }};">
         {%- for v in lista -%}
           {%- if v == blank -%}{%- continue -%}{%- endif -%}
           {%- assign ap = ap | plus: 1 -%}
@@ -71,7 +91,9 @@
           {%- endfor -%}
           {%- if v contains 'MORENO' -%}{%- assign de_la_casa = true -%}{%- endif -%}
           {%- assign del_proveedor = collection.products | where: 'vendor', v -%}
-          <section class="mn-apartado" aria-labelledby="mn-ap-{{ section.id }}-{{ ap }}">
+          {%- assign ancho = del_proveedor.size | at_most: cols -%}
+          {%- assign ancho_m = del_proveedor.size | at_most: cols_m -%}
+          <section class="mn-apartado mn-apartado--{{ ancho }} mn-apartado--m{{ ancho_m }}" style="--ap: {{ ancho }}; --ap-m: {{ ancho_m }};" aria-labelledby="mn-ap-{{ section.id }}-{{ ap }}">
             <header class="mn-apartado__head mn-reveal">
               <p class="mn-etiqueta">{{ s.texto_apartado }} {{ ap | prepend: '0' | slice: -2, 2 }}</p>
               <h2 class="mn-apartado__titulo" id="mn-ap-{{ section.id }}-{{ ap }}">{{ visible }}</h2>
@@ -80,7 +102,7 @@
                 {%- unless de_la_casa or s.texto_seleccion == blank %} · {{ s.texto_seleccion }}{% endunless -%}
               </p>
             </header>
-            <div class="mn-bento mn-bento--plano" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">
+            <div class="mn-bento mn-bento--plano" style="--cols: {{ ancho }}; --cols-m: {{ ancho_m }};">
               {%- for product in del_proveedor -%}
                 {%- assign n = n | plus: 1 -%}
                 {%- assign d = n | modulo: 6 -%}
@@ -89,6 +111,7 @@
             </div>
           </section>
         {%- endfor -%}
+        </div>
       {%- else -%}
       <h2 class="mn-sr">{{ s.texto_piezas | capitalize }}</h2>
       <div class="mn-bento mn-bento--plano" style="--cols: {{ s.columnas }}; --cols-m: {{ s.columnas_movil }};">

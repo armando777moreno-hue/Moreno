@@ -1,5 +1,41 @@
 # MORENO.co — Neomorfismo · Estado
 
+## 17–18/10 — Catálogo ampliado, apartados por distribuidor y fotos sobre arena
+
+Hecho:
+
+- **20 piezas en Todo**, en 7 colecciones: Todo, Old Money (10), Calzado (5), Joyería (4), Esenciales, Drop 001 y portada.
+  Las 13 de Shopify Collective (Lacoste, Devereux, Cole Haan ×2, Tod's, C Collection, Wessi, Ivy + Cloth, Loopback y
+  4 de joyería) tienen título, descripción, SEO y tipo en español, solo con datos del proveedor y atribuidos
+  ("según el proveedor"). Tres URL que repetían reclamos del proveedor ("pure-cashmere", "cashmere-blend",
+  "diamond-encrusted") ahora son `jersey-cuello-alto-punto`, `jersey-oversize-cuello-alto` y
+  `collar-espinas-ojos-rojos`, con redirección desde la antigua.
+- **Apartados** en la página de colección: cuando la página mezcla distribuidores, cada uno tiene su apartado con el
+  nombre de la marca (tabla `proveedor | nombre` en los ajustes de la sección). Los apartados de 1 o 2 piezas comparten
+  fila, así la página no queda con huecos. En la tarjeta, la marca va en pequeño y el modelo como título.
+- **Fotos**: 145 fotos de proveedor revisadas una a una. Los productos enteros pasan a mockup flotante sobre arena
+  (`tools/build_product_mockup.py`); las fotos con modelo o primeros planos cortados por el encuadre pasan a
+  "estudio" (`--studio`: mismo encuadre, fondo cambiado por arena). Se quedan como las da el proveedor las tablas de
+  tallas, fichas con medidas, escenas de joyería (muñeca, satén, madera) y las que el recorte estropeaba. Las fotos se
+  reemplazaron en su sitio (`fileUpdate`), así que conservan su posición y su enlace con las variantes. 12 fotos
+  repetidas o engañosas (por ejemplo un collage de 8 colores de una sudadera que solo se vende en azul marino) se
+  quitaron de su producto pero siguen en Contenido → Archivos.
+
+Pendiente (lo haces tú):
+
+1. **Publicar** "MORENO CO. — Arte 360° · Neomorfismo" (sigue sin publicar; la API no publica temas).
+2. **Collective**: desactiva la sincronización de título, descripción y multimedia en la app Shopify Collective, o el
+   proveedor volverá a poner sus textos en inglés y sus fotos.
+3. **Autenticidad de marcas**: Lacoste (I-Max Fashions), Cole Haan (rubbersoled) y Tod's (Banlieue91) son revendedores
+   que no dicen si son distribuidores autorizados. Pídeles prueba de autenticidad antes de vender con el nombre de la marca.
+4. **Gorras de marca**: Collective no devolvió gorras de marcas reconocidas (solo de equipos o con frases). Hace falta otra
+   búsqueda u otro proveedor.
+5. **Loopback**: los nombres de archivo de sus fotos ("ChatGPT Image…") indican que están generadas por IA. Pide fotos reales.
+6. La joyería del proveedor es de estilo hip hop (calaveras, espinas, circonitas): no encaja con "old money". Valora quitarla.
+7. Lacoste: la ficha del proveedor no incluye la talla L.
+8. Borra el tema viejo "MORENO.co — Neomorfismo" (id `188811837685`): guarda los archivos temporales usados para
+   descargar fotos y la API no puede borrar archivos de tema.
+
 ## 15/10 — "MORENO CO. — Arte 360° · Neomorfismo" (el tema que sustituye a Arte 360°)
 
 Tema **sin publicar** id `189241491701`: copia de Neomorfismo con los cambios de abajo. El tema publicado

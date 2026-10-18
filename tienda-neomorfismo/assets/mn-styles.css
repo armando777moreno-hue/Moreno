@@ -151,12 +151,17 @@ body { background: var(--mn-fondo) !important; background-attachment: scroll !im
 .mn-bento > .mn-card:first-child .mn-card__media { aspect-ratio: auto; flex: 1; min-height: 420px; }
 .mn-card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 8%; transition: opacity .5s var(--mn-ease), transform .8s var(--mn-ease); transform: translateZ(40px); }
 .mn-card__img--hover { opacity: 0; }
+/* Mockup 4:5 de borde a borde; la sombra hundida del hueco se repinta encima de la foto */
+.mn-card__img--lleno { padding: 0; object-fit: cover; }
+.mn-card__media--lleno::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; box-shadow: inherit; pointer-events: none; }
+.mn-card__media--lleno .mn-card__num, .mn-card__media--lleno .mn-card__badge { z-index: 2; }
 .mn-card__frase { position: absolute; inset: 0; display: grid; place-items: center; padding: 14%; text-align: center;
   font: italic 500 clamp(22px, 2.4vw, 34px)/1.15 var(--mn-marca); color: var(--mn-tinta); }
 .mn-card__num { position: absolute; top: 16px; left: 18px; }
 .mn-card__badge { position: absolute; top: 14px; right: 14px; padding: 7px 12px; border-radius: 999px; font: 500 11px/1 var(--mn-mono); letter-spacing: .1em; }
 .mn-card__info { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 18px 8px 6px; }
-.mn-card__title { font: 700 17px/1.25 var(--mn-cuerpo); letter-spacing: -.01em; }
+.mn-card__title { font: 700 17px/1.25 var(--mn-cuerpo); letter-spacing: -.01em; min-width: 0; overflow-wrap: anywhere; }
+.mn-card__marca { display: block; margin-bottom: 5px; font-size: 11px; font-weight: 500; }
 .mn-card__price { font: 500 15px/1 var(--mn-mono); white-space: nowrap; }
 .mn-card__tallas { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 8px; }
 .mn-card__tallas li { font: 500 11px/1 var(--mn-mono); padding: 6px 8px; border-radius: 10px; }

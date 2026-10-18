@@ -222,7 +222,16 @@
   </div>
 
   <div class="mn-barra mn-relieve" aria-hidden="true">
-    <span><strong>{{ product.title | split: '—' | first | strip }}</strong> · <span data-mn-barra-precio>{{ v_actual.price | money }}</span></span>
+    {%- liquid
+      assign partes = product.title | split: '—'
+      assign corto = partes | first | strip
+      if partes.size > 1
+        unless product.vendor contains 'MORENO'
+          assign corto = product.title | remove_first: partes[0] | remove_first: '—' | strip
+        endunless
+      endif
+    -%}
+    <span><strong>{{ corto }}</strong> ·<span data-mn-barra-precio>{{ v_actual.price | money }}</span></span>
     <button type="button" class="mn-btn mn-btn--acento" tabindex="-1">{{ s.boton_texto }}</button>
   </div>
 </section>

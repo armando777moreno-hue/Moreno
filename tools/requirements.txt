@@ -3,3 +3,4 @@ numpy
 scipy
 opencv-python-headless
 scikit-image
+rembg[cpu]

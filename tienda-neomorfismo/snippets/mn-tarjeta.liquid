@@ -1,20 +1,54 @@
 {%- comment -%}
   Tarjeta de producto en relieve. Parámetros: product, indice, numerar, mostrar_tallas, hover, delay, span, span_m (columnas que ocupa en ordenador / móvil).
   Sin foto: tarjeta tipográfica con la primera frase en cursiva de la descripción (el refrán).
+  Título "Marca — Modelo": en las prendas de la casa se muestra lo de antes de la raya (el nombre de la pieza);
+  en las de otros distribuidores, la marca va encima en pequeño y el modelo como título, para que dos
+  productos de la misma marca no se lean iguales.
+  Fotos 4:5 (los mockups de tools/build_product_mockup.py, 2000x2500) llenan el hueco de borde a borde: las de
+  estudio cortan a la modelo en el borde de la foto, y ese corte tiene que coincidir con el borde del hueco.
 {%- endcomment -%}
+{%- liquid
+  assign partes = product.title | split: '—'
+  assign titulo = partes | first | strip
+  assign marca = ''
+  if partes.size > 1
+    unless product.vendor contains 'MORENO'
+      assign marca = titulo
+      assign titulo = product.title | remove_first: partes[0] | remove_first: '—' | strip
+    endunless
+  endif
+-%}
 {%- assign img1 = product.featured_media -%}
 {%- assign img2 = product.media[1] -%}
+{%- liquid
+  assign lleno1 = false
+  assign lleno2 = false
+  if img1
+    assign w5 = img1.preview_image.width | times: 5
+    assign h4 = img1.preview_image.height | times: 4
+    if w5 == h4
+      assign lleno1 = true
+    endif
+  endif
+  if img2
+    assign w5 = img2.preview_image.width | times: 5
+    assign h4 = img2.preview_image.height | times: 4
+    if w5 == h4
+      assign lleno2 = true
+    endif
+  endif
+-%}
 <article class="mn-card mn-relieve mn-reveal{% if span > 1 %} mn-card--ancha{% endif %}{% if span_m > 1 %} mn-card--ancha-m{% endif %}" data-mn-tilt="7" data-delay="{{ delay | default: 0 }}"{% if span > 1 %} style="--span: {{ span }};"{% endif %}>
-  <a class="mn-card__media mn-hundido" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+  <a class="mn-card__media mn-hundido{% if lleno1 or lleno2 %} mn-card__media--lleno{% endif %}" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
     {%- if img1 -%}
-      <img class="mn-card__img" src="{{ img1 | image_url: width: 900 }}" alt="{{ img1.alt | default: product.title | escape }}"
+      <img class="mn-card__img{% if lleno1 %} mn-card__img--lleno{% endif %}" src="{{ img1 | image_url: width: 900 }}" alt="{{ img1.alt | default: product.title | escape }}"
         loading="lazy" width="{{ img1.preview_image.width }}" height="{{ img1.preview_image.height }}">
       {%- if hover and img2 -%}
-        <img class="mn-card__img mn-card__img--hover" src="{{ img2 | image_url: width: 900 }}" alt="" loading="lazy">
+        <img class="mn-card__img mn-card__img--hover{% if lleno2 %} mn-card__img--lleno{% endif %}" src="{{ img2 | image_url: width: 900 }}" alt="" loading="lazy">
       {%- endif -%}
     {%- else -%}
       {%- assign frase = product.description | split: '</em>' | first | strip_html | strip -%}
-      {%- if frase == blank or frase.size > 90 -%}{%- assign frase = product.title | split: '—' | first | strip -%}{%- endif -%}
+      {%- if frase == blank or frase.size > 90 -%}{%- assign frase = titulo -%}{%- endif -%}
       <span class="mn-card__frase">“{{ frase }}”</span>
     {%- endif -%}
     {%- if numerar -%}<span class="mn-card__num mn-etiqueta">{{ indice | prepend: '0' | slice: -2, 2 }}</span>{%- endif -%}
@@ -25,7 +59,10 @@
     {%- endif -%}
   </a>
   <div class="mn-card__info">
-    <h3 class="mn-card__title"><a href="{{ product.url }}">{{ product.title | split: '—' | first | strip }}</a></h3>
+    <h3 class="mn-card__title">
+      {%- if marca != blank -%}<span class="mn-card__marca mn-etiqueta">{{ marca }}</span>{%- endif -%}
+      <a href="{{ product.url }}">{{ titulo }}</a>
+    </h3>
     <p class="mn-card__price">
       {%- if product.price_varies -%}desde {% endif -%}{{ product.price_min | money }}
     </p>
